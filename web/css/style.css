@@ -1,0 +1,32 @@
+@font-face {
+    font-family: 'scream';
+    src: url('../fonts/BebasNeueBold.ttf');
+}
+
+body {
+    margin: 0;
+    font-size: 100% !important;
+}
+
+#koba {
+    width: 35%;
+    max-width: 350px;
+    margin: 0 auto;
+    display: block;
+}
+
+.main {
+    width: 100%;
+}
+
+.scream {
+    text-align: center;
+    margin: 0 auto;
+    font-family: 'scream';
+}
+
+h2 {
+    margin: 0px;
+    font-size: 5em !important;
+}
+

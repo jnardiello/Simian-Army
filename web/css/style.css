@@ -9,8 +9,7 @@ body {
 }
 
 #koba {
-    width: 35%;
-    max-width: 350px;
+    width: 350px;
     margin: 0 auto;
     display: block;
 }

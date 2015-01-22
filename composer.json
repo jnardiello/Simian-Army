@@ -1,0 +1,23 @@
+{
+    "name": "jnardiello/spider-monkey",
+    "description": "An Amazon webcrawler",
+    "autoload": {
+      "psr-4": {
+        "Simian\\": "src/"
+      }
+    },
+    "require": {
+        "guzzle/guzzle": "~3.9",
+        "symfony/dom-crawler": "~2.6"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.4"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jacopo Nardiello",
+            "email": "jacopo.nardiello@gmail.com"
+        }
+    ]
+}

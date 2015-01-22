@@ -29,3 +29,19 @@ h2 {
     font-size: 5em !important;
 }
 
+@media all and (max-width: 350px) {
+    #koba {
+        width: 300px;
+        margin: 0 auto;
+        display: block;
+    }
+}
+
+
+@media all and (min-width: 700px) {
+    #koba {
+        width: 500px;
+        margin: 0 auto;
+        display: block;
+    }
+}

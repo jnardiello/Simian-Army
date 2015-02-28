@@ -9,7 +9,6 @@ class PageBuilderTest extends \PHPUnit_Framework_TestCase
     public function testBuilderCanBuildPage()
     {
         $asin = "B0058DXA4W";
-
         $htmlStream = Stream::factory('test page');
 
         $expectedPage = new Page();

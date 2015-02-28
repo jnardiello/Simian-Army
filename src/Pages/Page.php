@@ -18,4 +18,14 @@ class Page
         $this->html = $htmlStream;
         return $this;
     }
+
+    public function getBody()
+    {
+        return $this->html;
+    }
+
+    public function getAsin()
+    {
+        return $this->asin;
+    }
 }

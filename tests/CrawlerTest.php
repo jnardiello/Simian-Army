@@ -4,19 +4,23 @@ namespace Simian;
 
 class CrawlerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCrawlerIsSavingLocallyWebPages()
+    public function setUp()
     {
-        $asins = [
+        $this->asins = [
             'B008EOJIVG',
         ];
-        $storageRoom = __DIR__ . "/storage/";
-        $fakeAmazonUrl = __DIR__ . "/fixtures/"; // should be http://amazon.it/gp/product/
+        // http://amazon.it/gp/product/
+        $this->fakeAmazonUrl = __DIR__ . "/fixtures/"; 
+        $this->storageRoom = __DIR__ . "/storage/";
+    }
 
-        $crawler = new Crawler($fakeAmazonUrl);
-        $crawler->setStorageFolder($storageRoom)
-                ->run($asins);
+    public function testCrawlerIsSavingLocallyWebPages()
+    {
+        $crawler = new Crawler($this->fakeAmazonUrl);
+        $crawler->setStorageFolder($this->storageRoom)
+                ->run($this->asins);
 
-        $expectedFilename = "B008EOJIVG-" . time() . ".html";
-        $this->assertTrue(file_exists($storageRoom . $expectedFilename));
+        $expectedFilename = $this->asins[0] . "-" . time() . ".html"; //ASIN-123456.html
+        $this->assertTrue(file_exists($this->storageRoom . $expectedFilename));
     }
 }

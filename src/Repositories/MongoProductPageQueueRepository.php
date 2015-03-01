@@ -6,6 +6,9 @@ use Simian\Pages\Page;
 
 class MongoProductPageQueueRepository
 {
+
+    const MAX_NUM_MESSAGES_TO_BE_CONSUMED = 10;
+
     private $client;
     private $db;
     private $collection;
@@ -26,5 +29,18 @@ class MongoProductPageQueueRepository
         ];
 
         $this->collection->insert($productDocument);
+    }
+
+    public function consume()
+    {
+        $results = [];
+
+        for ($i = 0; $i < self::MAX_NUM_MESSAGES_TO_BE_CONSUMED; $i++) {
+            $results[] = $this->collection->findAndModify(
+                                                [], [], null, ['remove' => true]
+                                            );
+        }
+
+        return array_filter($results);
     }
 }

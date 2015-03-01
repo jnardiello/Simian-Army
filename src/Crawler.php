@@ -14,20 +14,20 @@ class Crawler
 
     private $baseUrl;
     private $asins = [];
-    private $environment;
 
     public function __construct($baseUrl, Environment $environment)
     {
-        $this->environment = $environment;
         $this->baseUrl = $baseUrl;
         $this->client = new Client();
+        $this->storagePath = $environment->get('storage.path');
+
         $this->pageBuilder = new PageBuilder($this->baseUrl);
-        $this->storageRepository = new StorageRepository($environment->get('storage.path'));
+        $this->storageRepository = new StorageRepository($this->storagePath);
         $this->mongoProductPageQueueRepository = new MongoProductPageQueueRepository(
-            $environment->get('mongo.host'),
-            $environment->get('mongo.queues.db'),
-            self::MONGO_COLLECTION
-        );
+                                                        $environment->get('mongo.host'),
+                                                        $environment->get('mongo.queues.db'),
+                                                        self::MONGO_COLLECTION
+                                                     );
     }
 
     public function run(array $asins)

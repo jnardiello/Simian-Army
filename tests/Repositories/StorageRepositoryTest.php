@@ -22,13 +22,13 @@ class StorageRepositoryTest extends \PHPUnit_Framework_TestCase
         $asin = "B0058DXA4W";
         $htmlStream = Stream::factory('test page');
 
-        // ASIN-TIME().html
-        $expectedFilename = $this->storagePath . $asin . "-" . time() . ".html";
-
         $pageBuilder = new PageBuilder();
         $page = $pageBuilder->setAsin($asin)
                             ->setBody($htmlStream)
                             ->build();
+
+        // ASIN-TIME().html
+        $expectedFilename = $this->storagePath . $asin . "-" . $page->getTime() . ".html";
 
         $repository = new StorageRepository($this->storagePath);
         $repository->add($page);

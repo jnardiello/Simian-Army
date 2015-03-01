@@ -12,6 +12,11 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         ];
         $this->baseUrl = "http://www.amazon.it/gp/product/";
         $this->storageRoom = __DIR__ . "/storage/";
+
+        $this->client = new \MongoClient();
+        $this->queueDb = $this->client->selectDB("test");
+        $this->productPagesQueue = $this->queueDb
+                                        ->selectCollection("product_pages_queue");
     }
 
     public function tearDown()
@@ -21,11 +26,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
     public function testCrawlerIsSavingLocallyWebPages()
     {
-        $expectedFilename = $this->asins[0] . "-" . time() . ".html"; //ASIN-123456.html
-
         $crawler = new Crawler($this->baseUrl, $this->storageRoom);
         $files = $crawler->run($this->asins);
 
         $this->assertEquals(2, count($files));
+        $this->assertEquals(2, $this->productPagesQueue->count());
     }
 }

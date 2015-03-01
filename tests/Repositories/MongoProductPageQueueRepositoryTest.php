@@ -4,13 +4,15 @@ namespace Simian\Repositories;
 
 use Simian\Pages\PageBuilder;
 use GuzzleHttp\Stream\Stream;
+use Simian\Environment\Environment;
 
 class MongoProductPageQueueRepositoryTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        $this->client = new \MongoClient();
-        $this->queueDb = $this->client->selectDB("test");
+        $this->environment = new Environment('test');
+        $this->client = new \MongoClient($this->environment->get('mongo.host'));
+        $this->queueDb = $this->client->selectDB($this->environment->get('mongo.queues.db'));
         $this->productPagesQueue = $this->queueDb
                                         ->selectCollection("product_pages_queue");
     }
@@ -28,7 +30,11 @@ class MongoProductPageQueueRepositoryTest extends \PHPUnit_Framework_TestCase
         $productPage = $pageBuilder->setAsin("B00KDRUCJY")
                                    ->setBody($htmlStream)
                                    ->build();
-        $pageRepository = new MongoProductPageQueueRepository("test", "product_pages_queue");
+        $pageRepository = new MongoProductPageQueueRepository(
+            $this->environment->get('mongo.host'),
+            $this->environment->get('mongo.queues.db'),
+            "product_pages_queue"
+        );
         $pageRepository->push($productPage, 'this-is-a-test-filename.html');
 
         $this->assertEquals(1, $this->productPagesQueue->count());

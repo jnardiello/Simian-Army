@@ -10,9 +10,9 @@ class MongoProductPageQueueRepository
     private $db;
     private $collection;
 
-    public function __construct($db, $collection)
+    public function __construct($host, $db, $collection)
     {
-        $this->client = new \MongoClient();
+        $this->client = new \MongoClient($host);
         $this->db = $this->client->selectDB($db);
         $this->collection = $this->db->selectCollection($collection);
     }

@@ -24,6 +24,7 @@ class Crawler
         $this->pageBuilder = new PageBuilder($this->baseUrl);
         $this->storageRepository = new StorageRepository($environment->get('storage.path'));
         $this->mongoProductPageQueueRepository = new MongoProductPageQueueRepository(
+            $environment->get('mongo.host'),
             $environment->get('mongo.queues.db'),
             self::MONGO_COLLECTION
         );

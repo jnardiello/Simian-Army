@@ -83,8 +83,6 @@ class Crawler
 
     private function getHtmlStream($asin)
     {
-        var_dump($this->buildRequestUrl($asin));
-        die();
         $request = $this->client->createRequest('GET', $this->buildRequestUrl($asin));
         $response = $this->client->send($request);
         $bodyStream = $response->getBody(true);

@@ -5,24 +5,26 @@ namespace Simian;
 use Simian\Pages\PageBuilder;
 use Simian\Repositories\StorageRepository;
 use Simian\Repositories\MongoProductPageQueueRepository;
+use Simian\Environment\Environment;
 use GuzzleHttp\Client;
 
 class Crawler
 {
-    const MONGO_DB = "queues";
     const MONGO_COLLECTION = "product_pages_queue";
 
     private $baseUrl;
     private $asins = [];
+    private $environment;
 
-    public function __construct($baseUrl, $storagePath)
+    public function __construct($baseUrl, Environment $environment)
     {
+        $this->environment = $environment;
         $this->baseUrl = $baseUrl;
         $this->client = new Client();
         $this->pageBuilder = new PageBuilder($this->baseUrl);
-        $this->storageRepository = new StorageRepository($storagePath);
+        $this->storageRepository = new StorageRepository($environment->get('storage.path'));
         $this->mongoProductPageQueueRepository = new MongoProductPageQueueRepository(
-            self::MONGO_DB,
+            $environment->get('mongo.queues.db'),
             self::MONGO_COLLECTION
         );
     }

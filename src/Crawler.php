@@ -14,6 +14,12 @@ class Crawler
 
     private $baseUrl;
     private $asins = [];
+    private $client;
+    private $storagePath;
+    private $pageBuilder;
+    private $storageRepository;
+    private $mongoProductPageQueueRepository;
+    private $urlPostParams;
 
     public function __construct($baseUrl, Environment $environment)
     {
@@ -28,6 +34,13 @@ class Crawler
                                                         $environment->get('mongo.queues.db'),
                                                         self::MONGO_COLLECTION
                                                      );
+    }
+
+    public function sortByMostRecent()
+    {
+        $this->urlPostParams .= "sortBy=bySubmissionDateDescending";
+
+        return $this;
     }
 
     public function run(array $asins)
@@ -48,6 +61,15 @@ class Crawler
         return $writtenFiles;
     }
 
+    private function buildRequestUrl($asin)
+    {
+        // amazon.it/product-reviews/<ASIN>?<post params>
+        return $this->baseUrl . 
+               $asin .
+               "?".
+               $this->urlPostParams;
+    }
+
     private function getPage($asin)
     {
         $htmlStream = $this->getHtmlStream($asin);
@@ -61,7 +83,9 @@ class Crawler
 
     private function getHtmlStream($asin)
     {
-        $request = $this->client->createRequest('GET', $this->baseUrl . $asin);
+        var_dump($this->buildRequestUrl($asin));
+        die();
+        $request = $this->client->createRequest('GET', $this->buildRequestUrl($asin));
         $response = $this->client->send($request);
         $bodyStream = $response->getBody(true);
 

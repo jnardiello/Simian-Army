@@ -1,0 +1,8 @@
+FLOW CHART
+------------------------------------
+
+user subscribes -> fill-in seller data -> we connect to the store front page -> crawl all the store-front pages -> extract all products ASINS (renew on a daily basis)
+
+user login -> picks which products to monitor -> select when he wants to be notified about new reviews
+
+a process supervisor spawned every minute checks which product to craw according to time interval selected by user -> crawl starts, supervisor passes list of ASINS to crawl (maybe should be a page object?)

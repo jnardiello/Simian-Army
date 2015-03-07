@@ -8,7 +8,7 @@ use Simian\Repositories\MongoProductPageQueueRepository;
 use Simian\Environment\Environment;
 use GuzzleHttp\Client;
 
-class Crawler
+class StorageKeeper
 {
     const MONGO_COLLECTION = "product_pages_queue";
 
@@ -21,10 +21,10 @@ class Crawler
     private $mongoProductPageQueueRepository;
     private $urlPostParams;
 
-    public function __construct($baseUrl, Environment $environment)
+    public function __construct($baseUrl, Environment $environment, Client $client)
     {
         $this->baseUrl = $baseUrl;
-        $this->client = new Client();
+        $this->client = $client;
         $this->storagePath = $environment->get('storage.path');
 
         $this->pageBuilder = new PageBuilder($this->baseUrl);

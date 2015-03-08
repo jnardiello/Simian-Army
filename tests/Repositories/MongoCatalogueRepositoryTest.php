@@ -31,7 +31,10 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
                 '_id' => 'a-merchant-id',
                 'name' => 'a-merchant-name',
                 'products' => [
-                    'a-product-asin',
+                    [
+                        'asin' => 'a-product-asin',
+                        'active' => false,
+                    ],
                 ]
             ]
         ];

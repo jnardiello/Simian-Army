@@ -23,13 +23,17 @@ class MongoCatalogueRepository
 
     public function add($asin)
     {
+        $newProduct = [
+            'asin' => $asin,
+            'active' => false,
+        ];
         $this->collection->findAndModify(
             [
                 '_id' => $this->asin
             ],
             [
                 '$push' => [
-                    'products' => $asin,
+                    'products' => $newProduct,
                 ],
             ]
     );

@@ -5,6 +5,7 @@ namespace Simian;
 use Simian\Environment\Environment;
 use GuzzleHttp\Client;
 use Symfony\Component\DomCrawler\Crawler;
+use Simian\Repositories\MongoCatalogueRepository;
 
 /**
  * Class CatalogueScraper
@@ -16,15 +17,16 @@ class CatalogueScraper
     private $client;
     private $catalogue = [];
 
-    public function __construct(Environment $environment, Client $client, $catalogueRepository)
+    public function __construct(Environment $environment, Client $client)
     {
         $this->environment = $environment;
         $this->client = $client;
-        $this->repository = $catalogueRepository;
     }
 
-    public function run($merchantId = null, $url = null)
+    public function run($merchantId, $url = null)
     {
+        $this->repository = new MongoCatalogueRepository($this->environment, $merchantId);
+
         if (isset($merchantId) && !isset($url)) {
             $url = $this->buildRequestUrl($merchantId);
         }
@@ -34,12 +36,13 @@ class CatalogueScraper
 
         $productsList = $crawler->filterXPath('//div[@id="resultsCol"]//li/@data-asin')
                                 ->each(function($document) {
-                                    $this->repository->addAsin($asin);
+                                    $asin = $document->text();
+                                    $this->repository->add($asin);
                                 });
 
         $nextLink = $crawler->filterXPath('(//a[@id="pagnNextLink"]/@href)[1]');
         if ($nextLink->count()) {
-            $this->run(null, 'http://amazon.co.uk' . $nextLink->text());
+            $this->run($merchantId, 'http://amazon.co.uk' . $nextLink->text());
         }
     }
 

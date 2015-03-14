@@ -45,6 +45,23 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function test_repository_should_not_add_two_times_the_same_review()
     {
-        $this->markTestIncomplete();
+        $asin = 'an-asin';
+        $review = [
+            'rating' => 'a-review-rating',
+            'title' => 'a-review-title',
+            'author' => 'an-author-name',
+            'date' => 'some-date',
+            'verified-purchase' => 'yes',
+            'item_link' => 'http://some-line.com',
+            'asin' => $asin,
+            'permalink' => 'http://some-permalink.com',
+            'text' => 'great product!',
+        ];
+
+        $repository = new MongoReviewsRepository($this->environment);
+        $repository->addReviewToAsin($review, $asin);
+        $repository->addReviewToAsin($review, $asin);
+
+        $this->assertEquals(1, $this->reviewsCollection->count());
     }
 }

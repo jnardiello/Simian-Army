@@ -4,6 +4,7 @@ namespace Simian;
 
 use GuzzleHttp\Client;
 use Simian\Environment\Environment;
+use Simian\Repositories\MongoReviewsRepository;
 
 /**
  * @author Jacopo Nardiello <jacopo.nardiello@gmail.com>
@@ -16,6 +17,7 @@ class ReviewsScraperTest extends \PHPUnit_Framework_TestCase
         $client = new \MongoClient($this->environment->get('mongo.host'));
         $db = $client->selectDb($this->environment->get('mongo.data.db'));
         $this->collection = $db->selectCollection($this->environment->get('mongo.reviews'));
+        $this->repository = new MongoReviewsRepository($this->environment);
     }
 
     public function tearDown()
@@ -49,17 +51,18 @@ class ReviewsScraperTest extends \PHPUnit_Framework_TestCase
                  ->willReturn($stubbedHtml);
         $reviewsScraper = new ReviewsScraper(
             $this->environment,
-            $client
+            $client,
+            $this->repository
         );
 
         $reviewsScraper->run([
-            'a-text-asin',
+            'a-test-asin',
         ]);
 
         $this->assertEquals(10, $this->collection->count());
     }
 
-    public function test_scraper_should_run_only_if_md5_has_changed()
+    public function test_scraper_should_not_run_without_new_reviews()
     {
     }
 }

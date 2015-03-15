@@ -16,11 +16,11 @@ class ReviewsScraper
     private $environment;
     private $client;
 
-    public function __construct(Environment $environment, Client $client)
+    public function __construct(Environment $environment, Client $client, MongoReviewsRepository $repository)
     {
         $this->environment = $environment;
         $this->client = $client;
-        $this->repository = new MongoReviewsRepository($environment);
+        $this->repository = $repository;
     }
 
     public function run(array $asins = [])

@@ -26,6 +26,7 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         $asin = 'an-asin';
         $review = [
+            '_id' => 'this-is-an-id',
             'rating' => 'a-review-rating',
             'title' => 'a-review-title',
             'author' => 'an-author-name',
@@ -47,6 +48,7 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         $asin = 'an-asin';
         $review = [
+            '_id' => 'this-is-an-id',
             'rating' => 'a-review-rating',
             'title' => 'a-review-title',
             'author' => 'an-author-name',
@@ -59,8 +61,10 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
         ];
 
         $repository = new MongoReviewsRepository($this->environment);
-        $repository->addReviewToAsin($review, $asin);
-        $repository->addReviewToAsin($review, $asin);
+
+        for ($i = 0; $i < 10; $i++) {
+            $repository->addReviewToAsin($review, $asin);
+        }
 
         $this->assertEquals(1, $this->reviewsCollection->count());
     }

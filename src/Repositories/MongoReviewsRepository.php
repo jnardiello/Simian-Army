@@ -17,13 +17,9 @@ class MongoReviewsRepository
 
     public function addReviewToAsin($review)
     {
-        $alreadyIn = $this->reviewsCollection->find([
-            'asin' => $review['asin'],
-            'title' => $review['title'],
-            'author' => $review['author'],
-        ]);
+        $doc = $this->reviewsCollection->findOne(["_id" => $review['_id']]);
 
-        if (!$alreadyIn->count()) {
+        if (empty($doc)) {
             $this->reviewsCollection->insert($review);
         }
     }

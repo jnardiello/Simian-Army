@@ -31,7 +31,7 @@ class ReviewsScraperTest extends \PHPUnit_Framework_TestCase
         );
 
         $reviewsScraper->run([
-            'B00RXIK98K',
+            'B00RXILJ16',
         ]);
 
         $this->assertEquals(36, $this->collection->count());

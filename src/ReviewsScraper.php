@@ -38,6 +38,7 @@ class ReviewsScraper
         $crawler = new Crawler((string) $stream);
         $reviewsList = $crawler->filterXPath('//table[@id="productReviews"]//td/div')
             ->each(function($doc) use ($asin){
+                $review['_id'] = $this->extractIdFromPermalink($this->exists('(//div/span/a/@href)[1]', $doc));
                 $review['rating'] = $this->exists('(//div//span/@class)[1]', $doc);
                 $review['title'] = $this->exists('(//b)[1]', $doc);
                 $review['author'] = $this->exists('(//div/a[1])[1]', $doc);
@@ -55,6 +56,18 @@ class ReviewsScraper
         if ($nextLink->count()) {
             $this->persistReviewsPage($asin, $nextLink->text());
         }
+    }
+
+    private function extractIdFromPermalink($url)
+    {
+        $regex = '/http:\/\/www.amazon.co.uk\/review\/(R[A-Z0-9]+)(.*)/i';
+        preg_match($regex, $url, $matches);
+
+        if (!isset($matches[1])) {
+            throw new \Exception('Couldnt find id for review');
+        }
+            
+        return $reviewId = $matches[1];
     }
 
     private function exists($xpath, $doc) {

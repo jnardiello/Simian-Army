@@ -60,7 +60,7 @@ class ReviewsScraper
 
     private function extractIdFromPermalink($url)
     {
-        $regex = '/http:\/\/www.amazon.co.uk\/review\/(R[A-Z0-9]+)(.*)/i';
+        $regex = '/.*\/(R[A-Z0-9]+)\/.*/i';
         preg_match($regex, $url, $matches);
 
         if (!isset($matches[1])) {

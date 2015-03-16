@@ -34,16 +34,12 @@ class ReviewsScraper
 
     private function persistReviewsPage($asin, $url, $currentDepth = null, $maxDepth = null)
     {
-        if (isset($maxDepth) && $currentDepth == $maxDepth) {
-            return ;
-        }
-
         $stream = $this->getHtmlStream($url);
         $crawler = new Crawler((string) $stream);
 
         // Checking number of review pages that we actually need to crawl
         if (!isset($currentDepth, $maxDepth)) {
-            $currentDepth = 0;
+            $currentDepth = 1;
             $maxDepth = $this->getNumPagesToCrawl($asin, $crawler);
         }
 
@@ -62,6 +58,10 @@ class ReviewsScraper
 
                 $this->repository->addReviewToAsin($review, $asin);
             });
+
+        if ($currentDepth == $maxDepth) {
+            return ;
+        }
 
         $nextLink = $crawler->filterXPath("(//span[@class='paging']/a[contains(text(), 'Next ›')]/@href)[1]");
         if ($nextLink->count()) {

@@ -62,7 +62,48 @@ class ReviewsScraperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(10, $this->collection->count());
     }
 
-    public function test_scraper_should_not_run_without_new_reviews()
+    public function test_scraper_should_scrape_just_required_pages()
     {
+        $stubbedHtml = file_get_contents(__DIR__ . "/fixtures/html/reviews2.html");
+
+        // Mocking guzzle
+        $client = $this->getMockBuilder('GuzzleHttp\Client')
+                       ->disableOriginalConstructor()
+                       ->getMock();
+        $request = $this->getMockBuilder('GuzzleHttp\Message\Request')
+                        ->disableOriginalConstructor()
+                        ->getMock();
+        $response = $this->getMockBuilder('GuzzleHttp\Message\Response')
+                         ->disableOriginalConstructor()
+                         ->getMock();
+        $htmlStream = $this->getMockBuilder('GuzzleHttp\Stream\Stream')
+                           ->disableOriginalConstructor()
+                           ->getMock();
+
+        $client->expects($this->once())
+               ->method('createRequest')
+               ->willReturn($request);
+        $client->method('send')
+               ->willReturn($response);
+        $response->method('getBody')
+            ->willReturn($stubbedHtml);
+
+        $reviewsScraper = new ReviewsScraper(
+            $this->environment,
+            $client,
+            $this->repository
+        );
+
+        $reviewsJsonString = file_get_contents(__DIR__ . "/fixtures/json/reviews.json");
+        $reviewsFixtures = json_decode($reviewsJsonString, true);
+
+        // loading fixtures
+        foreach ($reviewsFixtures as $fixture) {
+            $this->collection->insert($fixture);
+        }
+
+        $reviewsScraper->run([
+            'a-test-asin',
+        ]);
     }
 }

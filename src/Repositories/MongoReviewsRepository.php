@@ -23,4 +23,11 @@ class MongoReviewsRepository
             $this->reviewsCollection->insert($review);
         }
     }
+
+    public function countReviewsFor($asin)
+    {
+        return $this->reviewsCollection->count([
+            'asin' => $asin,
+        ]);
+    }
 }

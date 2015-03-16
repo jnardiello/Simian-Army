@@ -68,4 +68,40 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, $this->reviewsCollection->count());
     }
+
+    public function test_can_count_all_reviews_for_a_given_product()
+    {
+        $asin = 'an-asin';
+        $review1 = [
+            '_id' => 'this-is-an-id',
+            'rating' => 'a-review-rating',
+            'title' => 'a-review-title',
+            'author' => 'an-author-name',
+            'date' => 'some-date',
+            'verified-purchase' => 'yes',
+            'item_link' => 'http://some-line.com',
+            'asin' => $asin,
+            'permalink' => 'http://some-permalink.com',
+            'text' => 'great product!',
+        ];
+
+        $review2 = [
+            '_id' => 'another-id',
+            'rating' => 'a-review-rating',
+            'title' => 'a-review-title',
+            'author' => 'an-author-name',
+            'date' => 'some-date',
+            'verified-purchase' => 'yes',
+            'item_link' => 'http://some-line.com',
+            'asin' => $asin,
+            'permalink' => 'http://some-permalink.com',
+            'text' => 'great product!',
+        ];
+
+        $repository = new MongoReviewsRepository($this->environment);
+        $repository->addReviewToAsin($review1, $asin);
+        $repository->addReviewToAsin($review2, $asin);
+
+        $this->assertEquals(2, $repository->countReviewsFor($asin));
+    }
 }

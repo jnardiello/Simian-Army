@@ -32,10 +32,21 @@ class ReviewsScraper
         }
     }
 
-    private function persistReviewsPage($asin, $url)
+    private function persistReviewsPage($asin, $url, $currentDepth = null, $maxDepth = null)
     {
+        if (isset($maxDepth) && $currentDepth == $maxDepth) {
+            return ;
+        }
+
         $stream = $this->getHtmlStream($url);
         $crawler = new Crawler((string) $stream);
+
+        // Checking number of review pages that we actually need to crawl
+        if (!isset($currentDepth, $maxDepth)) {
+            $currentDepth = 0;
+            $maxDepth = $this->getNumPagesToCrawl($asin, $crawler);
+        }
+
         $reviewsList = $crawler->filterXPath('//table[@id="productReviews"]//td/div')
             ->each(function($doc) use ($asin){
                 $review['_id'] = $this->extractIdFromPermalink($this->exists('(//div/span/a/@href)[1]', $doc));
@@ -54,7 +65,7 @@ class ReviewsScraper
 
         $nextLink = $crawler->filterXPath("(//span[@class='paging']/a[contains(text(), 'Next ›')]/@href)[1]");
         if ($nextLink->count()) {
-            $this->persistReviewsPage($asin, $nextLink->text());
+            $this->persistReviewsPage($asin, $nextLink->text(), ++$currentDepth, $maxDepth);
         }
     }
 
@@ -94,5 +105,17 @@ class ReviewsScraper
                $asin .
                '?sortBy=bySubmissionDateDescending';
 
+    }
+
+    private function getNumPagesToCrawl($asin, $crawler)
+    {
+        $numCurrentReviews = $crawler->filterXPath("(//table[@id='productSummary']//b)[1]")->text();
+        $regex = '/^([0-9]+).*$/i';
+        preg_match($regex, $numCurrentReviews, $matches);
+
+        $currentTotReviews = (int) $matches[1];
+        $alreadyStoreRepositories = $this->repository->countReviewsFor($asin);
+         
+        return ceil(($currentTotReviews - $alreadyStoreRepositories)/10);
     }
 }

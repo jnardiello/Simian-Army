@@ -8,7 +8,8 @@
     },
     "require": {
         "symfony/dom-crawler": "~2.6",
-        "guzzlehttp/guzzle": "~5.1"
+        "guzzlehttp/guzzle": "~5.1",
+        "mailgun/mailgun-php": "~1.7.2"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.4"

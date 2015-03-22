@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use Simian\Environment\Environment;
 use Simian\Repositories\MongoReviewsRepository;
 use Symfony\Component\DomCrawler\Crawler;
+use Mailgun\Mailgun;
 
 /**
  * Class ReviewsScraper
@@ -21,6 +22,7 @@ class ReviewsScraper
         $this->environment = $environment;
         $this->client = $client;
         $this->repository = $repository;
+        $this->mailgun = new Mailgun('key-f33b7d4556b361eeba543eeca496654b');
     }
 
     public function run(array $asins = [])
@@ -57,6 +59,16 @@ class ReviewsScraper
                 $review['text'] = $this->exists('//div[@class="reviewText"]', $doc);
 
                 $this->repository->addReviewToAsin($review, $asin);
+                $domain = "simian.army";
+                $html = "<h1>A new review was added</h1><br /><div>Title: {$review['title']}<br />Author: {$review['author']}<br />Product: <a href='http://www.amazon.co.uk/dp/{$asin}'>{$asin}</a></div>";
+
+                # Make the call to the client.
+                $result = $this->mailgun->sendMessage($domain, array(
+                    'from'    => 'Simian General <simian.general@simian.army>',
+                    'to'      => 'jacopo.nardiello@gmail.com',
+                    'subject' => 'A new review was added',
+                    'html'    => $html
+                ));
             });
 
         if ($currentDepth == $maxDepth) {

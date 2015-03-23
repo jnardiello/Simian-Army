@@ -66,15 +66,15 @@ class CatalogueScraperTest extends \PHPUnit_Framework_TestCase
         $expectedProducts = [
             [
                 'asin' => 'asin-1',
-                'active' => false,
+                'active' => true,
             ],
             [
                 'asin' => 'asin-2',
-                'active' => false,
+                'active' => true,
             ],
             [
                 'asin' => 'asin-3',
-                'active' => false,
+                'active' => true,
             ],
         ];
         $catalogue = $this->collection->findOne([

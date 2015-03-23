@@ -80,7 +80,7 @@ class ReviewsScraperTest extends \PHPUnit_Framework_TestCase
                            ->disableOriginalConstructor()
                            ->getMock();
 
-        $client->expects($this->once())
+        $client->expects($this->exactly(2))
                ->method('createRequest')
                ->willReturn($request);
         $client->method('send')

@@ -41,8 +41,12 @@ class ReviewsScraper
 
         // Checking number of review pages that we actually need to crawl
         if (!isset($currentDepth, $maxDepth)) {
-            $currentDepth = 1;
+            $currentDepth = 0;
             $maxDepth = $this->getNumPagesToCrawl($asin, $crawler);
+        }
+
+        if ($currentDepth == $maxDepth) {
+            return ;
         }
 
         $reviewsList = $crawler->filterXPath('//table[@id="productReviews"]//td/div')
@@ -63,17 +67,13 @@ class ReviewsScraper
                 $html = "<h1>A new review was added</h1><br /><div>Title: {$review['title']}<br />Author: {$review['author']}<br />Product: <a href='http://www.amazon.co.uk/dp/{$asin}'>{$asin}</a></div>";
 
                 # Make the call to the client.
-                $result = $this->mailgun->sendMessage($domain, array(
-                    'from'    => 'Simian General <simian.general@simian.army>',
-                    'to'      => 'jacopo.nardiello@gmail.com',
-                    'subject' => 'A new review was added',
-                    'html'    => $html
-                ));
+                /* $result = $this->mailgun->sendMessage($domain, array( */
+                /*     'from'    => 'Simian General <simian.general@simian.army>', */
+                /*     'to'      => 'jacopo.nardiello@gmail.com', */
+                /*     'subject' => 'A new review was added', */
+                /*     'html'    => $html */
+                /* )); */
             });
-
-        if ($currentDepth == $maxDepth) {
-            return ;
-        }
 
         $nextLink = $crawler->filterXPath("(//span[@class='paging']/a[contains(text(), 'Next ›')]/@href)[1]");
         if ($nextLink->count()) {
@@ -122,12 +122,14 @@ class ReviewsScraper
     private function getNumPagesToCrawl($asin, $crawler)
     {
         $numCurrentReviews = $crawler->filterXPath("(//table[@id='productSummary']//b)[1]")->text();
-        $regex = '/^([0-9]+).*$/i';
+        $regex = '/^([0-9,]+).*$/i';
         preg_match($regex, $numCurrentReviews, $matches);
 
-        $currentTotReviews = (int) $matches[1];
+        // Need to sanitize reviews with thousands of reviews
+        // format '3,704' -> 3704 int
+        $currentTotReviews = (int) str_replace(',', '', $matches[1]);
         $alreadyStoreRepositories = $this->repository->countReviewsFor($asin);
-         
+
         return ceil(($currentTotReviews - $alreadyStoreRepositories)/10);
     }
 }

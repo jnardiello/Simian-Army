@@ -13,7 +13,7 @@ class MongoCatalogueRepository
     public function __construct(Environment $environment, $merchantId)
     {
         $this->environment = $environment;
-        $this->asin = $merchantId;
+        $this->merchantId = $merchantId;
         $client = new \MongoClient($environment->get('mongo.host'));
         $mainDb = $client->selectDB($environment->get('mongo.data.db'));
         $this->collection = $mainDb->selectCollection(
@@ -25,11 +25,11 @@ class MongoCatalogueRepository
     {
         $newProduct = [
             'asin' => $asin,
-            'active' => false,
+            'active' => true,
         ];
         $this->collection->findAndModify(
             [
-                '_id' => $this->asin
+                '_id' => $this->merchantId
             ],
             [
                 '$push' => [
@@ -37,5 +37,21 @@ class MongoCatalogueRepository
                 ],
             ]
     );
+    }
+
+    public function getProductsCatalogue()
+    {
+        $catalogueCursor = $this->collection->find([
+            '_id' => $this->merchantId
+        ]);
+
+        $catalogue = iterator_to_array($catalogueCursor);
+
+        $results = [];
+        foreach ($catalogue[$this->merchantId]['products'] as $product) {
+            $results[] = $product['asin'];
+        }
+
+        return $results;
     }
 }

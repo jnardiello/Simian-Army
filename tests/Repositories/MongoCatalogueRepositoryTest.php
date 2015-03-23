@@ -33,7 +33,7 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
                 'products' => [
                     [
                         'asin' => 'a-product-asin',
-                        'active' => false,
+                        'active' => true,
                     ],
                 ]
             ]
@@ -49,5 +49,24 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
             '_id' => 'a-merchant-id'
         ]);
         $this->assertEquals($expectedMerchantFixtures, iterator_to_array($merchantData));
+    }
+
+    public function testRepositoryCanRecoverListOfProducts()
+    {
+        $merchantFixture = [
+            '_id' => 'a-merchant-id',
+            'name' => 'a-merchant-name',
+            'products' => [],
+        ];
+        $expectedProducts = ['a-product-asin', 'another-product-asin'];
+
+        $this->merchantsCollection->insert($merchantFixture);
+
+        $repository = new MongoCatalogueRepository($this->environment, 'a-merchant-id');
+        $repository->add('a-product-asin');
+        $repository->add('another-product-asin');
+
+        $products = $repository->getProductsCatalogue();
+        $this->assertEquals($expectedProducts, $products);
     }
 }

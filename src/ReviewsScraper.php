@@ -36,6 +36,7 @@ class ReviewsScraper
 
     private function persistReviewsPage($asin, $url, $currentDepth = null, $maxDepth = null)
     {
+        var_dump("Scraping {$asin}");
         $stream = $this->getHtmlStream($url);
         $crawler = new Crawler((string) $stream);
 
@@ -121,7 +122,7 @@ class ReviewsScraper
 
     private function getNumPagesToCrawl($asin, $crawler)
     {
-        $numCurrentReviews = $crawler->filterXPath("(//table[@id='productSummary']//b)[1]")->text();
+        $numCurrentReviews = $this->exists("(//table[@id='productSummary']//b)[1]", $crawler);
         $regex = '/^([0-9,]+).*$/i';
         preg_match($regex, $numCurrentReviews, $matches);
 

@@ -17,7 +17,10 @@ class ReviewsScraperTest extends \PHPUnit_Framework_TestCase
         $client = new \MongoClient($this->environment->get('mongo.host'));
         $db = $client->selectDb($this->environment->get('mongo.data.db'));
         $this->collection = $db->selectCollection($this->environment->get('mongo.reviews'));
-        $this->repository = new MongoReviewsRepository($this->environment);
+        $mailgun = $this->getMockBuilder('Mailgun\Mailgun')
+                        ->setMethods(['sendMessage'])
+                        ->getMock();
+        $this->repository = new MongoReviewsRepository($this->environment, $mailgun);
     }
 
     public function tearDown()

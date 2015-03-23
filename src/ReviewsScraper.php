@@ -16,13 +16,19 @@ class ReviewsScraper
 {
     private $environment;
     private $client;
+    private $starsMapper = [
+        'swSprite s_star_5_0 ' => 5,
+        'swSprite s_star_4_0 ' => 4,
+        'swSprite s_star_3_0 ' => 3,
+        'swSprite s_star_2_0 ' => 2,
+        'swSprite s_star_1_0 ' => 1,
+            ];
 
     public function __construct(Environment $environment, Client $client, MongoReviewsRepository $repository)
     {
         $this->environment = $environment;
         $this->client = $client;
         $this->repository = $repository;
-        $this->mailgun = new Mailgun('key-f33b7d4556b361eeba543eeca496654b');
     }
 
     public function run(array $asins = [])
@@ -53,7 +59,7 @@ class ReviewsScraper
         $reviewsList = $crawler->filterXPath('//table[@id="productReviews"]//td/div')
             ->each(function($doc) use ($asin){
                 $review['_id'] = $this->extractIdFromPermalink($this->exists('(//div/span/a/@href)[1]', $doc));
-                $review['rating'] = $this->exists('(//div//span/@class)[1]', $doc);
+                $review['rating'] = $this->prettyRating($this->exists('(//div//span/@class)[1]', $doc));
                 $review['title'] = $this->exists('(//b)[1]', $doc);
                 $review['author'] = $this->exists('(//div/a[1])[1]', $doc);
                 $review['date'] = new \MongoDate(strtotime($this->exists('(//nobr)[1]', $doc)));
@@ -64,22 +70,17 @@ class ReviewsScraper
                 $review['text'] = $this->exists('//div[@class="reviewText"]', $doc);
 
                 $this->repository->addReviewToAsin($review, $asin);
-                $domain = "simian.army";
-                $html = "<h1>A new review was added</h1><br /><div>Title: {$review['title']}<br />Author: {$review['author']}<br />Product: <a href='http://www.amazon.co.uk/dp/{$asin}'>{$asin}</a></div>";
-
-                # Make the call to the client.
-                /* $result = $this->mailgun->sendMessage($domain, array( */
-                /*     'from'    => 'Simian General <simian.general@simian.army>', */
-                /*     'to'      => 'jacopo.nardiello@gmail.com', */
-                /*     'subject' => 'A new review was added', */
-                /*     'html'    => $html */
-                /* )); */
             });
 
         $nextLink = $crawler->filterXPath("(//span[@class='paging']/a[contains(text(), 'Next ›')]/@href)[1]");
         if ($nextLink->count()) {
             $this->persistReviewsPage($asin, $nextLink->text(), ++$currentDepth, $maxDepth);
         }
+    }
+
+    private function prettyRating($rating)
+    {
+        return $this->starsMapper[$rating];
     }
 
     private function extractIdFromPermalink($url)

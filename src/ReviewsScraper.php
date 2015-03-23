@@ -123,14 +123,16 @@ class ReviewsScraper
     private function getNumPagesToCrawl($asin, $crawler)
     {
         $numCurrentReviews = $this->exists("(//table[@id='productSummary']//b)[1]", $crawler);
-        $regex = '/^([0-9,]+).*$/i';
-        preg_match($regex, $numCurrentReviews, $matches);
+        if (isset($numCurrentReviews)) {
+            $regex = '/^([0-9,]+).*$/i';
+            preg_match($regex, $numCurrentReviews, $matches);
 
-        // Need to sanitize reviews with thousands of reviews
-        // format '3,704' -> 3704 int
-        $currentTotReviews = (int) str_replace(',', '', $matches[1]);
-        $alreadyStoreRepositories = $this->repository->countReviewsFor($asin);
+            // Need to sanitize reviews with thousands of reviews
+            // format '3,704' -> 3704 int
+            $currentTotReviews = (int) str_replace(',', '', $matches[1]);
+            $alreadyStoreRepositories = $this->repository->countReviewsFor($asin);
 
-        return ceil(($currentTotReviews - $alreadyStoreRepositories)/10);
+            return ceil(($currentTotReviews - $alreadyStoreRepositories)/10);
+        }
     }
 }

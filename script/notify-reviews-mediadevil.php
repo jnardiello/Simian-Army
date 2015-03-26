@@ -11,16 +11,19 @@ use Simian\Repositories\MongoReviewsRepository;
 use Mailgun\Mailgun;
 
 $environment = new Environment('prod');
-$mediadevil = "A1010PM0QYBVOG";
+$merchants = ["A1010PM0QYBVOG", "A3RFFOCMGATC6W", "A2CODDGMAUR50T"];
 $mailgun = new Mailgun('key-f33b7d4556b361eeba543eeca496654b');
-$catalogueRepository = new MongoCatalogueRepository($environment, $mediadevil);
-$reviewsRepository = new MongoReviewsRepository($environment, $mailgun);
-$client = new Client();
-$reviewsScraper = new ReviewsScraper(
-    $environment,
-    $client,
-    $reviewsRepository
-);
 
-$products = $catalogueRepository->getProductsCatalogue();
-$reviewsScraper->run($products);
+foreach ($merchants as $merchant) {
+    $catalogueRepository = new MongoCatalogueRepository($environment, $merchant);
+    $reviewsRepository = new MongoReviewsRepository($environment, $mailgun);
+    $client = new Client();
+    $reviewsScraper = new ReviewsScraper(
+        $environment,
+        $client,
+        $reviewsRepository
+    );
+
+    $products = $catalogueRepository->getProductsCatalogue();
+    $reviewsScraper->run($products);
+}

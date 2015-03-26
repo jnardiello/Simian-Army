@@ -8,7 +8,7 @@ use Simian\Environment\Environment;
 use GuzzleHttp\Client;
 
 $environment = new Environment('prod');
-$mediadevil = "A1010PM0QYBVOG";
+$merchants = ["A1010PM0QYBVOG", "A3RFFOCMGATC6W", "A2CODDGMAUR50T"];
 $client = new Client();
 
 $scraper = new CatalogueScraper(
@@ -16,4 +16,6 @@ $scraper = new CatalogueScraper(
     $client
 );
 
-$scraper->run($mediadevil);
+foreach ($merchants as $merchant) {
+    $scraper->run($merchant);
+}

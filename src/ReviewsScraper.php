@@ -56,26 +56,29 @@ class ReviewsScraper
             return ;
         }
 
-        $reviewsList = $crawler->filterXPath('//table[@id="productReviews"]//td/div')
-            ->each(function($doc) use ($asin){
-                $review['_id'] = $this->extractIdFromPermalink($this->exists('(//div/span/a/@href)[1]', $doc));
-                $review['rating'] = $this->prettyRating($this->exists('(//div//span/@class)[1]', $doc));
-                $review['title'] = $this->exists('(//b)[1]', $doc);
-                $review['author'] = $this->exists('(//div/a[1])[1]', $doc);
-                $review['date'] = new \MongoDate(strtotime($this->exists('(//nobr)[1]', $doc)));
-                $review['verified-purchase'] = $this->exists('//span[@class="crVerifiedStripe"]', $doc);
-                $review['item_link'] = $this->exists('(//b/a/@href)[1]', $doc);
-                $review['asin'] = $asin;
-                $review['permalink'] = $this->exists('(//div/span/a/@href)[1]', $doc);
-                $review['text'] = $this->exists('//div[@class="reviewText"]', $doc);
+        $crawler->filterXPath('//table[@id="productReviews"]//td/div')
+                ->each(function($doc) use ($asin){
+                    $review['_id'] = $this->extractIdFromPermalink($this->exists('(//div/span/a/@href)[1]', $doc));
+                    $review['rating'] = $this->prettyRating($this->exists('(//div//span/@class)[1]', $doc));
+                    $review['product_title'] = $this->exists('(//div/b)[1]', $doc);
+                    $review['product_link'] = $this->exists('(//div/b/a/@href)[1]', $doc);
+                    $review['title'] = $this->exists('(//b)[1]', $doc);
+                    $review['author'] = $this->exists('(//div/a[1])[1]', $doc);
+                    $review['date'] = new \MongoDate(strtotime($this->exists('(//nobr)[1]', $doc)));
+                    $review['verified-purchase'] = $this->exists('//span[@class="crVerifiedStripe"]', $doc);
+                    $review['item_link'] = $this->exists('(//b/a/@href)[1]', $doc);
+                    $review['asin'] = $asin;
+                    $review['permalink'] = $this->exists('(//div/span/a/@href)[1]', $doc);
+                    $review['text'] = $this->exists('//div[@class="reviewText"]', $doc);
 
-                $this->repository->addReviewToAsin($review, $asin);
+                    var_dump($review);
+//                    $this->repository->addReviewToAsin($review, $asin);
             });
 
-        $nextLink = $crawler->filterXPath("(//span[@class='paging']/a[contains(text(), 'Next ›')]/@href)[1]");
-        if ($nextLink->count()) {
-            $this->persistReviewsPage($asin, $nextLink->text(), ++$currentDepth, $maxDepth);
-        }
+//        $nextLink = $crawler->filterXPath("(//span[@class='paging']/a[contains(text(), 'Next ›')]/@href)[1]");
+//        if ($nextLink->count()) {
+//            $this->persistReviewsPage($asin, $nextLink->text(), ++$currentDepth, $maxDepth);
+//        }
     }
 
     private function prettyRating($rating)

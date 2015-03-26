@@ -42,9 +42,11 @@ class ReviewsScraper
 
     private function persistReviewsPage($asin, $url, $currentDepth = null, $maxDepth = null)
     {
-        var_dump("Scraping {$asin}");
+        /* var_dump("Scraping {$asin}"); */
         $stream = $this->getHtmlStream($url);
         $crawler = new Crawler((string) $stream);
+
+        $mainProductLink = $crawler->filterXPath('(//h1/div/a/@href)');
 
         // Checking number of review pages that we actually need to crawl
         if (!isset($currentDepth, $maxDepth)) {
@@ -52,7 +54,7 @@ class ReviewsScraper
             $maxDepth = $this->getNumPagesToCrawl($asin, $crawler);
         }
 
-        if ($currentDepth == $maxDepth) {
+        if ($currentDepth === $maxDepth) {
             return ;
         }
 
@@ -71,14 +73,13 @@ class ReviewsScraper
                     $review['permalink'] = $this->exists('(//div/span/a/@href)[1]', $doc);
                     $review['text'] = $this->exists('//div[@class="reviewText"]', $doc);
 
-                    var_dump($review);
-//                    $this->repository->addReviewToAsin($review, $asin);
+                    $this->repository->addReviewToAsin($review, $asin);
             });
 
-//        $nextLink = $crawler->filterXPath("(//span[@class='paging']/a[contains(text(), 'Next ›')]/@href)[1]");
-//        if ($nextLink->count()) {
-//            $this->persistReviewsPage($asin, $nextLink->text(), ++$currentDepth, $maxDepth);
-//        }
+        $nextLink = $crawler->filterXPath("(//span[@class='paging']/a[contains(text(), 'Next ›')]/@href)[1]");
+        if ($nextLink->count()) {
+            $this->persistReviewsPage($asin, $nextLink->text(), ++$currentDepth, $maxDepth);
+        }
     }
 
     private function prettyRating($rating)

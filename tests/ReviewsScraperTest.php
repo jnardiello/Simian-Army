@@ -9,7 +9,7 @@ use Simian\Repositories\MongoReviewsRepository;
 /**
  * @author Jacopo Nardiello <jacopo.nardiello@gmail.com>
  */
-class ReviewsScraperTest extends \PHPUnit_Framework_TestCase
+class ReviewsScraperTest extends AbstractScraperTest
 {
     public function setUp()
     {
@@ -17,10 +17,10 @@ class ReviewsScraperTest extends \PHPUnit_Framework_TestCase
         $client = new \MongoClient($this->environment->get('mongo.host'));
         $db = $client->selectDb($this->environment->get('mongo.data.db'));
         $this->collection = $db->selectCollection($this->environment->get('mongo.reviews'));
-        $mailgun = $this->getMockBuilder('Mailgun\Mailgun')
-                        ->setMethods(['sendMessage'])
-                        ->getMock();
-        $this->repository = new MongoReviewsRepository($this->environment, $mailgun);
+        $this->repository = new MongoReviewsRepository(
+                                    $this->environment, 
+                                    $this->getMailgunStub()
+                                );
     }
 
     public function tearDown()
@@ -32,29 +32,9 @@ class ReviewsScraperTest extends \PHPUnit_Framework_TestCase
     {
         $stubbedHtml = file_get_contents(__DIR__ . "/fixtures/html/reviews.html");
 
-        // Mocking guzzle
-        $client = $this->getMockBuilder('GuzzleHttp\Client')
-                       ->disableOriginalConstructor()
-                       ->getMock();
-        $request = $this->getMockBuilder('GuzzleHttp\Message\Request')
-                        ->disableOriginalConstructor()
-                        ->getMock();
-        $response = $this->getMockBuilder('GuzzleHttp\Message\Response')
-                         ->disableOriginalConstructor()
-                         ->getMock();
-        $htmlStream = $this->getMockBuilder('GuzzleHttp\Stream\Stream')
-                           ->disableOriginalConstructor()
-                           ->getMock();
-
-        $client->method('createRequest')
-               ->willReturn($request);
-        $client->method('send')
-               ->willReturn($response);
-        $response->method('getBody')
-                 ->willReturn($stubbedHtml);
         $reviewsScraper = new ReviewsScraper(
             $this->environment,
-            $client,
+            $this->getStubbedHttpClient($stubbedHtml),
             $this->repository
         );
 
@@ -68,28 +48,9 @@ class ReviewsScraperTest extends \PHPUnit_Framework_TestCase
     public function test_scraper_should_scrape_just_required_pages()
     {
         $stubbedHtml = file_get_contents(__DIR__ . "/fixtures/html/reviews2.html");
-
-        // Mocking guzzle
-        $client = $this->getMockBuilder('GuzzleHttp\Client')
-                       ->disableOriginalConstructor()
-                       ->getMock();
-        $request = $this->getMockBuilder('GuzzleHttp\Message\Request')
-                        ->disableOriginalConstructor()
-                        ->getMock();
-        $response = $this->getMockBuilder('GuzzleHttp\Message\Response')
-                         ->disableOriginalConstructor()
-                         ->getMock();
-        $htmlStream = $this->getMockBuilder('GuzzleHttp\Stream\Stream')
-                           ->disableOriginalConstructor()
-                           ->getMock();
-
-        $client->expects($this->exactly(2))
-               ->method('createRequest')
-               ->willReturn($request);
-        $client->method('send')
-               ->willReturn($response);
-        $response->method('getBody')
-            ->willReturn($stubbedHtml);
+        $client = $this->getStubbedHttpClient($stubbedHtml);
+        $client->expects($this->exactly(2)) // This test a bit more strict and behavioral
+               ->method('createRequest');
 
         $reviewsScraper = new ReviewsScraper(
             $this->environment,
@@ -108,5 +69,41 @@ class ReviewsScraperTest extends \PHPUnit_Framework_TestCase
         $reviewsScraper->run([
             'a-test-asin',
         ]);
+    }
+
+    public function test_scraper_should_select_product_link_from_review()
+    {
+        $stubbedHtml = file_get_contents(__DIR__ . "/fixtures/html/review-link.html");
+        $reviewsScraper = new ReviewsScraper(
+            $this->environment,
+            $this->getStubbedHttpClient($stubbedHtml),
+            $this->repository
+        );
+
+        $reviewsScraper->run([
+            'a-test-asin',
+        ]);
+
+        $persistedReview = $this->collection->findOne();
+        $this->assertEquals('http://www.amazon.co.uk/Minotaur-Screen-Protector-iPhone-Protectors-Matte/dp/B00OVI1H2C/ref=cm_cr_pr_orig_subj', $persistedReview['product_link']);
+        $this->assertEquals('This review is from: Minotaur Matte Anti Glare Screen Protector Pack for Apple iPhone 5/5S/5C (6 Screen Protectors) (Electronics)', $persistedReview['product_title']);
+    }
+
+    public function test_scraper_should_select_product_link_from_review_with_default_link()
+    {
+        $stubbedHtml = file_get_contents(__DIR__ . "/fixtures/html/review-no-link.html");
+        $reviewsScraper = new ReviewsScraper(
+            $this->environment,
+            $this->getStubbedHttpClient($stubbedHtml),
+            $this->repository
+        );
+
+        $reviewsScraper->run([
+            'a-test-asin',
+        ]);
+
+        $persistedReview = $this->collection->findOne();
+        $this->assertEquals('http://www.amazon.co.uk/Minotaur-Screen-Protector-iPhone-Protectors-Matte/dp/B00OVI1H2C/ref=cm_cr_pr_product_top', $persistedReview['product_link']);
+        $this->assertEquals('This review is from: Minotaur Matte Anti Glare Screen Protector Pack for Samsung Galaxy S5 (6 Screen Protectors) (Electronics)', $persistedReview['product_title']);
     }
 }

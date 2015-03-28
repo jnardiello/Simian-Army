@@ -31,14 +31,11 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
     public function test_repository_can_find_seller_data()
     {
         $this->loadMinotaurFixtures();
-        $sellerId = 'A3RFFOCMGATC6W';
-        $expectedSellerData = [
-            '_id' => 'A3RFFOCMGATC6W',
-            'name' => 'Minotaur',
-            'email' => 'callum@mediadevil.com',
-        ];
 
-        $this->assertEquals($expectedSellerData, $this->repository->findSellerData($sellerId));
+        $sellerId = 'A3RFFOCMGATC6W';
+
+        $this->assertEquals('Minotaur', $this->repository->findName($sellerId));
+        $this->assertEquals('callum@mediadevil.com', $this->repository->findEmail($sellerId));
     }
 
     private function loadMinotaurFixtures()

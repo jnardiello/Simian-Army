@@ -11,7 +11,7 @@ use Simian\Repositories\MongoReviewsRepository;
 use Mailgun\Mailgun;
 
 $environment = new Environment('prod');
-$merchants = ["A1010PM0QYBVOG", "A3RFFOCMGATC6W", "A2CODDGMAUR50T"];
+$merchants = ["A1010PM0QYBVOG", /*"A3RFFOCMGATC6W", "A2CODDGMAUR50T"*/];
 $mailgun = new Mailgun('key-f33b7d4556b361eeba543eeca496654b');
 
 foreach ($merchants as $merchant) {

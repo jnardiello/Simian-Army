@@ -58,15 +58,6 @@ class MongoSellerRepository
         $this->collection->remove($data);
     }
 
-    public function findSellerData($sellerId)
-    {
-        return [
-            '_id' => $sellerId,
-            'name' => $this->findName($sellerId),
-            'email' => $this->findEmail($sellerId)
-        ];
-    }
-
     private function sanitizeData($data)
     {
         if (!isset($data['_id'], $data['name'], $data['email'])) {

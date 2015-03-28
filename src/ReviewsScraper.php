@@ -45,16 +45,16 @@ class ReviewsScraper
         /* var_dump("Scraping {$asin}"); */
         $stream = $this->getHtmlStream($url);
         $crawler = new Crawler((string) $stream);
-
-        $mainProductLink = $crawler->filterXPath('(//h1/div/a/@href)');
+        $this->mainProductLink = $this->exists('(//h1/div/a/@href)[1]', $crawler);
 
         // Checking number of review pages that we actually need to crawl
         if (!isset($currentDepth, $maxDepth)) {
             $currentDepth = 0;
-            $maxDepth = $this->getNumPagesToCrawl($asin, $crawler);
+            $numPages = $this->getNumPagesToCrawl($asin, $crawler);
+            $maxDepth = (isset($numPages)) ? $numPages : 1; // If for some reason this isn't defined we scan only the current page
         }
 
-        if ($currentDepth === $maxDepth) {
+        if ($currentDepth == $maxDepth) {
             return ;
         }
 
@@ -62,8 +62,8 @@ class ReviewsScraper
                 ->each(function($doc) use ($asin){
                     $review['_id'] = $this->extractIdFromPermalink($this->exists('(//div/span/a/@href)[1]', $doc));
                     $review['rating'] = $this->prettyRating($this->exists('(//div//span/@class)[1]', $doc));
-                    $review['product_title'] = $this->exists('(//div/b)[1]', $doc);
-                    $review['product_link'] = $this->exists('(//div/b/a/@href)[1]', $doc);
+                    $review['product_title'] = $this->prettyProductTitle($this->exists('(//div/b)[1]', $doc));
+                    $review['product_link'] = $this->assignLink($this->exists('(//div/b/a/@href)[1]', $doc));
                     $review['title'] = $this->exists('(//b)[1]', $doc);
                     $review['author'] = $this->exists('(//div/a[1])[1]', $doc);
                     $review['date'] = new \MongoDate(strtotime($this->exists('(//nobr)[1]', $doc)));
@@ -80,6 +80,20 @@ class ReviewsScraper
         if ($nextLink->count()) {
             $this->persistReviewsPage($asin, $nextLink->text(), ++$currentDepth, $maxDepth);
         }
+    }
+
+    private function prettyProductTitle($text)
+    {
+        return str_replace("This review is from: ", "", $text);
+    }
+
+    private function assignLink($link)
+    {
+        if (!isset($link)) {
+            return $this->mainProductLink;
+        }
+
+        return $link;
     }
 
     private function prettyRating($rating)

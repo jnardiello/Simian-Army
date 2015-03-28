@@ -86,7 +86,7 @@ class ReviewsScraperTest extends AbstractScraperTest
 
         $persistedReview = $this->collection->findOne();
         $this->assertEquals('http://www.amazon.co.uk/Minotaur-Screen-Protector-iPhone-Protectors-Matte/dp/B00OVI1H2C/ref=cm_cr_pr_orig_subj', $persistedReview['product_link']);
-        $this->assertEquals('This review is from: Minotaur Matte Anti Glare Screen Protector Pack for Apple iPhone 5/5S/5C (6 Screen Protectors) (Electronics)', $persistedReview['product_title']);
+        $this->assertEquals('Minotaur Matte Anti Glare Screen Protector Pack for Apple iPhone 5/5S/5C (6 Screen Protectors) (Electronics)', $persistedReview['product_title']);
     }
 
     public function test_scraper_should_select_product_link_from_review_with_default_link()
@@ -104,6 +104,6 @@ class ReviewsScraperTest extends AbstractScraperTest
 
         $persistedReview = $this->collection->findOne();
         $this->assertEquals('http://www.amazon.co.uk/Minotaur-Screen-Protector-iPhone-Protectors-Matte/dp/B00OVI1H2C/ref=cm_cr_pr_product_top', $persistedReview['product_link']);
-        $this->assertEquals('This review is from: Minotaur Matte Anti Glare Screen Protector Pack for Samsung Galaxy S5 (6 Screen Protectors) (Electronics)', $persistedReview['product_title']);
+        $this->assertEquals('Minotaur Matte Anti Glare Screen Protector Pack for Samsung Galaxy S5 (6 Screen Protectors) (Electronics)', $persistedReview['product_title']);
     }
 }

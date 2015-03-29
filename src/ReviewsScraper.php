@@ -5,6 +5,7 @@ namespace Simian;
 use GuzzleHttp\Client;
 use Simian\Environment\Environment;
 use Simian\Repositories\MongoReviewsRepository;
+use Simian\Seller;
 use Symfony\Component\DomCrawler\Crawler;
 use Mailgun\Mailgun;
 
@@ -31,7 +32,7 @@ class ReviewsScraper
         $this->repository = $repository;
     }
 
-    public function run(array $asins = [])
+    public function run(Seller $seller, array $asins = [])
     {
         foreach ($asins as $asin) {
             $url = $this->buildRequestUrl($asin);
@@ -72,6 +73,8 @@ class ReviewsScraper
                     $review['asin'] = $asin;
                     $review['permalink'] = $this->exists('(//div/span/a/@href)[1]', $doc);
                     $review['text'] = $this->exists('//div[@class="reviewText"]', $doc);
+                    $review['seller_id'] = 'something';
+                    $review['seller_name'] = 'something';
 
                     $this->repository->addReviewToAsin($review, $asin);
             });

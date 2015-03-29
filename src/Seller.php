@@ -21,12 +21,11 @@ class Seller
     private $sellerId;
     private $repository;
 
-    public function __construct(Environment $environment, $sellerId)
+    public function __construct($sellerId, $sellerName, $sellerEmail)
     {
-        $this->repository = new MongoSellerRepository($environment);
         $this->sellerId = $sellerId;
-        $this->name = $this->repository->findName($sellerId);
-        $this->email = $this->repository->findEmail($sellerId);
+        $this->name = $sellerName;
+        $this->email = $sellerEmail;
     }
 
     public function getName()
@@ -42,7 +41,7 @@ class Seller
     public function toArray()
     {
         return [
-            'id' => $this->sellerId,
+            '_id' => $this->sellerId,
             'name' => $this->getName(),
             'email' => $this->getEmail(),
         ];

@@ -24,6 +24,7 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function test_repository_should_add_new_review_to_collection_and_send_email()
     {
+        $this->markTestSkipped();
         $mailgun = $this->getMockBuilder('Mailgun\Mailgun')
                         ->getMock();
         $mailgun->expects($this->once())
@@ -49,8 +50,9 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $this->reviewsCollection->count());
     }
 
-    public function xtest_repository_should_not_add_two_times_the_same_review()
+    public function test_repository_should_not_add_two_times_the_same_review()
     {
+        $this->markTestSkipped();
         $mailgun = $this->getMockBuilder('Mailgun\Mailgun')
                         ->getMock();
         $mailgun->expects($this->once())
@@ -79,8 +81,9 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $this->reviewsCollection->count());
     }
 
-    public function xtest_can_count_all_reviews_for_a_given_product()
+    public function test_can_count_all_reviews_for_a_given_product()
     {
+        $this->markTestSkipped();
         $mailgun = $this->getMockBuilder('Mailgun\Mailgun')
                         ->getMock();
         $mailgun->expects($this->exactly(2))

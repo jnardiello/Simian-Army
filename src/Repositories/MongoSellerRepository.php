@@ -8,7 +8,7 @@
 
 namespace Simian\Repositories;
 
-use Prophecy\Exception\Prediction\AggregateException;
+use Simian\Seller;
 use Simian\Environment\Environment;
 
 /**
@@ -28,40 +28,21 @@ class MongoSellerRepository
         $this->collection = $db->selectCollection($environment->get('mongo.merchants'));
     }
 
-    public function findName($sellerId)
+    public function findSeller($sellerId)
     {
         $data = $this->collection->findOne([
             '_id' => $sellerId,
         ]);
 
-        return $data['name'];
+        return new Seller(
+            $data['_id'],
+            $data['name'],
+            $data['email']
+        );
     }
 
-    public function findEmail($sellerId)
+    public function insertOne(Seller $seller)
     {
-        $data = $this->collection->findOne([
-            '_id' => $sellerId,
-        ]);
-
-        return $data['email'];
-    }
-
-    public function insertOne(array $sellerData)
-    {
-        $this->sanitizeData($sellerData);
-
-        $this->collection->insert($sellerData);
-    }
-
-    public function remove(array $data)
-    {
-        $this->collection->remove($data);
-    }
-
-    private function sanitizeData($data)
-    {
-        if (!isset($data['_id'], $data['name'], $data['email'])) {
-            throw new \Exception('Malformed data when adding new seller');
-        }
+        $this->collection->insert($seller->toArray());
     }
 }

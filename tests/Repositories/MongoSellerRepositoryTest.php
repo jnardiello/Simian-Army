@@ -9,6 +9,7 @@
 namespace Simian\Repositories;
 
 use Simian\Environment\Environment;
+use Simian\Seller;
 
 /**
 * Class MongoSellerRepositoryTest
@@ -21,31 +22,44 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         $this->environment = new Environment('test');
         $this->repository = new MongoSellerRepository($this->environment);
-    }
-
-    protected function tearDown()
-    {
-        $this->repository->remove([]);
-    }
-
-    public function test_repository_can_find_seller_data()
-    {
-        $this->loadMinotaurFixtures();
-
-        $sellerId = 'A3RFFOCMGATC6W';
-
-        $this->assertEquals('Minotaur', $this->repository->findName($sellerId));
-        $this->assertEquals('callum@mediadevil.com', $this->repository->findEmail($sellerId));
-    }
-
-    private function loadMinotaurFixtures()
-    {
-        $minotaurData = [
+        $client = new \MongoClient($this->environment->get('mongo.host'));
+        $this->merchantCollection = $client->selectDB($this->environment->get('mongo.data.db'))
+                                     ->selectCollection($this->environment->get('mongo.merchants'));
+        $this->expectedMinotaurData = [
             '_id' => 'A3RFFOCMGATC6W',
             'name' => 'Minotaur',
             'email' => 'callum@mediadevil.com'
         ];
+    }
 
-        $this->repository->insertOne($minotaurData);
+    protected function tearDown()
+    {
+        $this->merchantCollection->remove([]);
+    }
+
+    public function test_repository_should_create_a_seller()
+    {
+        $this->loadMinotaurFixtures();
+
+        $sellerId = 'A3RFFOCMGATC6W';
+        $seller = $this->repository->findSeller($sellerId);
+
+        $this->assertInstanceOf('Simian\Seller', $seller);
+        $this->assertEquals($this->expectedMinotaurData, $seller->toArray());
+    }
+
+    public function test_repository_should_insert_new_seller()
+    {
+        $seller = new Seller('a-seller-id', 'a-seller-name', 'a-seller-email');
+
+        $this->repository->insertOne($seller);
+        $actualSeller = $this->merchantCollection->findOne(['_id' => 'a-seller-id']);
+
+        $this->assertTrue(is_array($actualSeller));
+    }
+
+    private function loadMinotaurFixtures()
+    {
+        $this->merchantCollection->insert($this->expectedMinotaurData);
     }
 }

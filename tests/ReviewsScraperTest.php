@@ -2,7 +2,6 @@
 
 namespace Simian;
 
-use GuzzleHttp\Client;
 use Simian\Environment\Environment;
 use Simian\Repositories\MongoReviewsRepository;
 

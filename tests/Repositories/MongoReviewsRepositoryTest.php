@@ -24,7 +24,6 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function test_repository_should_add_new_review_to_collection_and_send_email()
     {
-        $this->markTestSkipped();
         $mailgun = $this->getMockBuilder('Mailgun\Mailgun')
                         ->getMock();
         $mailgun->expects($this->once())
@@ -34,8 +33,8 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
         $review = [
             '_id' => 'this-is-an-id',
             'rating' => 'a-review-rating',
-            'title' => 'a-review-title',
-            'author' => 'an-author-name',
+            'review_title' => 'a-review-title',
+            'review_author' => 'an-author-name',
             'date' => 'some-date',
             'verified-purchase' => 'yes',
             'item_link' => 'http://some-line.com',
@@ -52,7 +51,6 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function test_repository_should_not_add_two_times_the_same_review()
     {
-        $this->markTestSkipped();
         $mailgun = $this->getMockBuilder('Mailgun\Mailgun')
                         ->getMock();
         $mailgun->expects($this->once())
@@ -62,8 +60,8 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
         $review = [
             '_id' => 'this-is-an-id',
             'rating' => 'a-review-rating',
-            'title' => 'a-review-title',
-            'author' => 'an-author-name',
+            'review_title' => 'a-review-title',
+            'review_author' => 'an-author-name',
             'date' => 'some-date',
             'verified-purchase' => 'yes',
             'item_link' => 'http://some-line.com',
@@ -83,7 +81,6 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function test_can_count_all_reviews_for_a_given_product()
     {
-        $this->markTestSkipped();
         $mailgun = $this->getMockBuilder('Mailgun\Mailgun')
                         ->getMock();
         $mailgun->expects($this->exactly(2))
@@ -93,8 +90,8 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
         $review1 = [
             '_id' => 'this-is-an-id',
             'rating' => 'a-review-rating',
-            'title' => 'a-review-title',
-            'author' => 'an-author-name',
+            'review_title' => 'a-review-title',
+            'review_author' => 'an-author-name',
             'date' => 'some-date',
             'verified-purchase' => 'yes',
             'item_link' => 'http://some-line.com',
@@ -106,8 +103,8 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
         $review2 = [
             '_id' => 'another-id',
             'rating' => 'a-review-rating',
-            'title' => 'a-review-title',
-            'author' => 'an-author-name',
+            'review_title' => 'a-review-title',
+            'review_author' => 'an-author-name',
             'date' => 'some-date',
             'verified-purchase' => 'yes',
             'item_link' => 'http://some-line.com',

@@ -66,11 +66,10 @@ class ReviewsScraper
                     $review['rating'] = $this->prettyRating($this->exists('(//div//span/@class)[1]', $doc));
                     $review['product_title'] = $this->prettyProductTitle($this->exists('(//div/b)[1]', $doc));
                     $review['product_link'] = $this->assignLink($this->exists('(//div/b/a/@href)[1]', $doc));
-                    $review['title'] = $this->exists('(//b)[1]', $doc);
-                    $review['author'] = $this->exists('(//div/a[1])[1]', $doc);
+                    $review['review_title'] = $this->exists('(//b)[1]', $doc);
+                    $review['review_author'] = $this->exists('(//div/a[1])[1]', $doc);
                     $review['date'] = new \MongoDate(strtotime($this->exists('(//nobr)[1]', $doc)));
-                    $review['verified-purchase'] = $this->exists('//span[@class="crVerifiedStripe"]', $doc);
-                    $review['item_link'] = $this->exists('(//b/a/@href)[1]', $doc);
+                    $review['verified_purchase'] = $this->exists('//span[@class="crVerifiedStripe"]', $doc);
                     $review['asin'] = $asin;
                     $review['permalink'] = $this->exists('(//div/span/a/@href)[1]', $doc);
                     $review['text'] = $this->exists('//div[@class="reviewText"]', $doc);

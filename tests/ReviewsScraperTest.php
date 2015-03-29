@@ -24,6 +24,8 @@ class ReviewsScraperTest extends AbstractScraperTest
                                 );
         $this->merchantsCollection = $client->selectDB($this->environment->get('mongo.data.db'))
                                             ->selectCollection($this->environment->get('mongo.merchants'));
+        $this->queueCollection = $client->selectDB($this->environment->get('mongo.data.db'))
+                                        ->selectCollection($this->environment->get('mongo.queue'));
         $this->seller = new Seller('A3RFFOCMGATC6W', 'Minotaur Accessories', 'someemail@minotaur.com');
     }
 
@@ -31,6 +33,7 @@ class ReviewsScraperTest extends AbstractScraperTest
     {
         $this->collection->remove([]);
         $this->merchantsCollection->remove([]);
+        $this->queueCollection->remove([]);
     }
 
     public function test_can_scrape_product_page_and_persist_reviews()

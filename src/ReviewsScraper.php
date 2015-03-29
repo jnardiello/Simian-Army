@@ -5,6 +5,7 @@ namespace Simian;
 use GuzzleHttp\Client;
 use Simian\Environment\Environment;
 use Simian\Repositories\MongoReviewsRepository;
+use Simian\Reviews\ReviewBuilder;
 use Simian\Seller;
 use Symfony\Component\DomCrawler\Crawler;
 use Mailgun\Mailgun;
@@ -75,6 +76,8 @@ class ReviewsScraper
                     $review['text'] = $this->exists('//div[@class="reviewText"]', $doc);
                     $review['seller_id'] = $this->seller->getId();
                     $review['seller_name'] = $this->seller->getName();
+
+                    $review = ReviewBuilder::aReviewFromArray($review);
 
                     $this->repository->addReviewToAsin($review, $asin);
             });

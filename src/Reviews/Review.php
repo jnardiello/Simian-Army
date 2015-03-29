@@ -45,6 +45,11 @@ class Review
         $this->data[$key] = $value;
     }
 
+    public function getId()
+    {
+        return $this->id;
+    }
+
     public function toArray()
     {
         $result = [

@@ -3,6 +3,7 @@
 namespace Simian\Repositories;
 
 use Simian\Environment\Environment;
+use Simian\Reviews\ReviewBuilder;
 
 /**
  * @author Jacopo Nardiello
@@ -22,16 +23,16 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->reviewsCollection->remove([]);
     }
 
-    public function test_repository_should_add_new_review_to_collection_and_send_email()
+    public function test_repository_should_add_new_review_and_push_to_mail_queue()
     {
-        $mailgun = $this->getMockBuilder('Mailgun\Mailgun')
-                        ->getMock();
-        $mailgun->expects($this->once())
-                 ->method('sendMessage');
-
         $asin = 'an-asin';
-        $review = [
+        $review = ReviewBuilder::aReviewFromArray([
             '_id' => 'this-is-an-id',
+            'seller_id' => 'some_seller_id',
+            'seller_name' => 'some_seller_name',
+            'product_title' => 'some-product-title',
+            'product_link' => 'product-link',
+            'verified_purchase' => 'yes',
             'rating' => 'a-review-rating',
             'review_title' => 'a-review-title',
             'review_author' => 'an-author-name',
@@ -41,9 +42,9 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
             'asin' => $asin,
             'permalink' => 'http://some-permalink.com',
             'text' => 'great product!',
-        ];
+        ]);
 
-        $repository = new MongoReviewsRepository($this->environment, $mailgun);
+        $repository = new MongoReviewsRepository($this->environment);
         $repository->addReviewToAsin($review, $asin);
 
         $this->assertEquals(1, $this->reviewsCollection->count());
@@ -51,14 +52,14 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function test_repository_should_not_add_two_times_the_same_review()
     {
-        $mailgun = $this->getMockBuilder('Mailgun\Mailgun')
-                        ->getMock();
-        $mailgun->expects($this->once())
-                 ->method('sendMessage');
-
         $asin = 'an-asin';
-        $review = [
+        $review = ReviewBuilder::aReviewFromArray([
             '_id' => 'this-is-an-id',
+            'seller_id' => 'some_seller_id',
+            'seller_name' => 'some_seller_name',
+            'product_title' => 'some-product-title',
+            'product_link' => 'product-link',
+            'verified_purchase' => 'yes',
             'rating' => 'a-review-rating',
             'review_title' => 'a-review-title',
             'review_author' => 'an-author-name',
@@ -68,9 +69,9 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
             'asin' => $asin,
             'permalink' => 'http://some-permalink.com',
             'text' => 'great product!',
-        ];
+        ]);
 
-        $repository = new MongoReviewsRepository($this->environment, $mailgun);
+        $repository = new MongoReviewsRepository($this->environment);
 
         for ($i = 0; $i < 10; $i++) {
             $repository->addReviewToAsin($review, $asin);
@@ -81,14 +82,14 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function test_can_count_all_reviews_for_a_given_product()
     {
-        $mailgun = $this->getMockBuilder('Mailgun\Mailgun')
-                        ->getMock();
-        $mailgun->expects($this->exactly(2))
-                 ->method('sendMessage');
-
         $asin = 'an-asin';
-        $review1 = [
+        $review1 = ReviewBuilder::aReviewFromArray([
             '_id' => 'this-is-an-id',
+            'seller_id' => 'some_seller_id',
+            'seller_name' => 'some_seller_name',
+            'product_title' => 'some-product-title',
+            'product_link' => 'product-link',
+            'verified_purchase' => 'yes',
             'rating' => 'a-review-rating',
             'review_title' => 'a-review-title',
             'review_author' => 'an-author-name',
@@ -98,10 +99,15 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
             'asin' => $asin,
             'permalink' => 'http://some-permalink.com',
             'text' => 'great product!',
-        ];
+        ]);
 
-        $review2 = [
-            '_id' => 'another-id',
+        $review2 = ReviewBuilder::aReviewFromArray([
+            '_id' => 'this-is-another-id',
+            'seller_id' => 'some_seller_id',
+            'seller_name' => 'some_seller_name',
+            'product_title' => 'some-product-title',
+            'product_link' => 'product-link',
+            'verified_purchase' => 'yes',
             'rating' => 'a-review-rating',
             'review_title' => 'a-review-title',
             'review_author' => 'an-author-name',
@@ -111,9 +117,9 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
             'asin' => $asin,
             'permalink' => 'http://some-permalink.com',
             'text' => 'great product!',
-        ];
+        ]);
 
-        $repository = new MongoReviewsRepository($this->environment, $mailgun);
+        $repository = new MongoReviewsRepository($this->environment);
         $repository->addReviewToAsin($review1, $asin);
         $repository->addReviewToAsin($review2, $asin);
 

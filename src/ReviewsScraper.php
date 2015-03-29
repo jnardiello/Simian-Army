@@ -34,6 +34,7 @@ class ReviewsScraper
 
     public function run(Seller $seller, array $asins = [])
     {
+        $this->seller = $seller;
         foreach ($asins as $asin) {
             $url = $this->buildRequestUrl($asin);
 
@@ -73,8 +74,8 @@ class ReviewsScraper
                     $review['asin'] = $asin;
                     $review['permalink'] = $this->exists('(//div/span/a/@href)[1]', $doc);
                     $review['text'] = $this->exists('//div[@class="reviewText"]', $doc);
-                    $review['seller_id'] = 'something';
-                    $review['seller_name'] = 'something';
+                    $review['seller_id'] = $this->seller->getId();
+                    $review['seller_name'] = $this->seller->getName();
 
                     $this->repository->addReviewToAsin($review, $asin);
             });

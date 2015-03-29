@@ -23,6 +23,7 @@ class ReviewsScraperTest extends AbstractScraperTest
                                 );
         $this->merchantsCollection = $client->selectDB($this->environment->get('mongo.data.db'))
                                             ->selectCollection($this->environment->get('mongo.merchants'));
+        $this->seller = new Seller('A3RFFOCMGATC6W', 'Minotaur Accessories', 'someemail@minotaur.com');
     }
 
     public function tearDown()
@@ -33,7 +34,6 @@ class ReviewsScraperTest extends AbstractScraperTest
 
     public function test_can_scrape_product_page_and_persist_reviews()
     {
-        $this->markTestIncomplete();
         $stubbedHtml = file_get_contents(__DIR__ . "/fixtures/html/reviews.html");
 
         $reviewsScraper = new ReviewsScraper(
@@ -42,7 +42,7 @@ class ReviewsScraperTest extends AbstractScraperTest
             $this->repository
         );
 
-        $reviewsScraper->run([
+        $reviewsScraper->run($this->seller, [
             'a-test-asin',
         ]);
 
@@ -51,7 +51,6 @@ class ReviewsScraperTest extends AbstractScraperTest
 
     public function test_scraper_should_scrape_just_required_pages()
     {
-        $this->markTestIncomplete();
         $stubbedHtml = file_get_contents(__DIR__ . "/fixtures/html/reviews2.html");
         $client = $this->getStubbedHttpClient($stubbedHtml);
         $client->expects($this->exactly(2)) // This test a bit more strict and behavioral
@@ -71,14 +70,13 @@ class ReviewsScraperTest extends AbstractScraperTest
             $this->collection->insert($fixture);
         }
 
-        $reviewsScraper->run([
+        $reviewsScraper->run($this->seller, [
             'a-test-asin',
         ]);
     }
 
     public function test_scraper_should_select_product_link_from_review()
     {
-        $this->markTestIncomplete();
         $stubbedHtml = file_get_contents(__DIR__ . "/fixtures/html/review-link.html");
         $reviewsScraper = new ReviewsScraper(
             $this->environment,
@@ -86,7 +84,7 @@ class ReviewsScraperTest extends AbstractScraperTest
             $this->repository
         );
 
-        $reviewsScraper->run([
+        $reviewsScraper->run($this->seller, [
             'a-test-asin',
         ]);
 
@@ -97,7 +95,6 @@ class ReviewsScraperTest extends AbstractScraperTest
 
     public function test_scraper_should_select_product_link_from_review_with_default_link()
     {
-        $this->markTestIncomplete();
         $stubbedHtml = file_get_contents(__DIR__ . "/fixtures/html/review-no-link.html");
         $reviewsScraper = new ReviewsScraper(
             $this->environment,
@@ -105,7 +102,7 @@ class ReviewsScraperTest extends AbstractScraperTest
             $this->repository
         );
 
-        $reviewsScraper->run([
+        $reviewsScraper->run($this->seller, [
             'a-test-asin',
         ]);
 
@@ -123,9 +120,8 @@ class ReviewsScraperTest extends AbstractScraperTest
             $this->getStubbedHttpClient($stubbedHtml),
             $this->repository
         );
-        $seller = new Seller($this->environment, 'A3RFFOCMGATC6W'); // Minotaur Accessories
 
-        $reviewsScraper->run($seller, [
+        $reviewsScraper->run($this->seller, [
             'a-test-asin',
         ]);
 

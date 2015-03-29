@@ -19,7 +19,6 @@ use Simian\Repositories\MongoSellerRepository;
 class Seller
 {
     private $sellerId;
-    private $repository;
 
     public function __construct($sellerId, $sellerName, $sellerEmail)
     {
@@ -31,6 +30,11 @@ class Seller
     public function getName()
     {
         return $this->name;
+    }
+
+    public function getId()
+    {
+        return $this->sellerId;
     }
 
     public function getEmail()

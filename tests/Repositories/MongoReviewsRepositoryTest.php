@@ -16,11 +16,14 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
         $client = new \MongoClient($this->environment->get('mongo.host'));
         $mainDb = $client->selectDB($this->environment->get('mongo.data.db'));
         $this->reviewsCollection = $mainDb->selectCollection($this->environment->get('mongo.reviews'));
+        $this->queueCollection = $mainDb->selectCollection($this->environment->get('mongo.queue'));
+        $this->queueRepository = new MongoMailQueueRepository($this->environment);
     }
 
     public function tearDown()
     {
         $this->reviewsCollection->remove([]);
+        $this->queueCollection->remove([]);
     }
 
     public function test_repository_should_add_new_review_and_push_to_mail_queue()
@@ -44,10 +47,11 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
             'text' => 'great product!',
         ]);
 
-        $repository = new MongoReviewsRepository($this->environment);
+        $repository = new MongoReviewsRepository($this->environment, $this->queueRepository);
         $repository->addReviewToAsin($review, $asin);
 
         $this->assertEquals(1, $this->reviewsCollection->count());
+        $this->assertEquals(1, $this->queueCollection->count());
     }
 
     public function test_repository_should_not_add_two_times_the_same_review()
@@ -71,7 +75,7 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
             'text' => 'great product!',
         ]);
 
-        $repository = new MongoReviewsRepository($this->environment);
+        $repository = new MongoReviewsRepository($this->environment, $this->queueRepository);
 
         for ($i = 0; $i < 10; $i++) {
             $repository->addReviewToAsin($review, $asin);
@@ -119,7 +123,7 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
             'text' => 'great product!',
         ]);
 
-        $repository = new MongoReviewsRepository($this->environment);
+        $repository = new MongoReviewsRepository($this->environment, $this->queueRepository);
         $repository->addReviewToAsin($review1, $asin);
         $repository->addReviewToAsin($review2, $asin);
 

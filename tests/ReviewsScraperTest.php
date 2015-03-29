@@ -3,6 +3,7 @@
 namespace Simian;
 
 use Simian\Environment\Environment;
+use Simian\Repositories\MongoMailQueueRepository;
 use Simian\Repositories\MongoReviewsRepository;
 
 /**
@@ -16,9 +17,10 @@ class ReviewsScraperTest extends AbstractScraperTest
         $client = new \MongoClient($this->environment->get('mongo.host'));
         $db = $client->selectDb($this->environment->get('mongo.data.db'));
         $this->collection = $db->selectCollection($this->environment->get('mongo.reviews'));
+        $this->queueRepository = new MongoMailQueueRepository($this->environment);
         $this->repository = new MongoReviewsRepository(
-                                    $this->environment, 
-                                    $this->getMailgunStub()
+                                    $this->environment,
+                                    $this->queueRepository
                                 );
         $this->merchantsCollection = $client->selectDB($this->environment->get('mongo.data.db'))
                                             ->selectCollection($this->environment->get('mongo.merchants'));

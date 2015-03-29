@@ -10,11 +10,12 @@ use Simian\Reviews\Review;
  */
 class MongoReviewsRepository
 {
-    public function __construct($environment)
+    public function __construct($environment, MongoMailQueueRepository $queueRepository)
     {
         $client = new \MongoClient($environment->get('mongo.host'));
         $mainDb = $client->selectDB($environment->get('mongo.data.db'));
         $this->reviewsCollection = $mainDb->selectCollection($environment->get('mongo.reviews'));
+        $this->queueRepository = $queueRepository;
     }
 
     public function addReviewToAsin(Review $review)
@@ -23,6 +24,7 @@ class MongoReviewsRepository
 
         if (empty($doc)) {
             $this->reviewsCollection->insert($review->toArray());
+            $this->queueRepository->push('send_review_email', $review->toArray());
         }
     }
 

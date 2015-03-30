@@ -58,6 +58,17 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_array($actualSeller));
     }
 
+    public function test_repository_insert_should_be_idempotent()
+    {
+        $seller = new Seller('a-seller-id', 'a-seller-name', 'a-seller-email');
+
+        $this->repository->insertOne($seller);
+        $this->repository->insertOne($seller);
+        $actualSeller = $this->merchantCollection->find(['_id' => 'a-seller-id']);
+
+        $this->assertEquals(1, $actualSeller->count());
+    }
+
     private function loadMinotaurFixtures()
     {
         $this->merchantCollection->insert($this->expectedMinotaurData);

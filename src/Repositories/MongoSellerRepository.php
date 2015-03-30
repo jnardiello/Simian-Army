@@ -43,6 +43,13 @@ class MongoSellerRepository
 
     public function insertOne(Seller $seller)
     {
-        $this->collection->insert($seller->toArray());
+        $alreadyThere = $this->collection->findOne([
+            '_id' => $seller->getId(),
+        ]);
+
+        if (!isset($alreadyThere)) {
+            $this->collection->insert($seller->toArray());
+        }
+
     }
 }

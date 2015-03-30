@@ -3,6 +3,7 @@
 namespace Simian\Repositories;
 
 use Simian\Environment\Environment;
+use Simian\Seller;
 
 class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
 {

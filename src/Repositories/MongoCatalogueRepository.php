@@ -23,20 +23,31 @@ class MongoCatalogueRepository
 
     public function add($asin)
     {
+        $alreadyInCatalogue = false;
         $newProduct = [
             'asin' => $asin,
             'active' => true,
         ];
-        $this->collection->findAndModify(
-            [
-                '_id' => $this->merchantId
-            ],
-            [
-                '$push' => [
-                    'products' => $newProduct,
+
+        $seller = $this->collection->findOne(['_id' => $this->merchantId]);
+
+        foreach ($seller['products'] as $product) {
+            if ($product['asin'] == $asin) {
+                $alreadyInCatalogue = true;
+            }
+        }
+
+        if (!$alreadyInCatalogue) {
+            $this->collection->findAndModify(
+                [
+                    '_id' => $this->merchantId
                 ],
-            ]
-    );
+                [
+                    '$push' => [
+                        'products' => $newProduct,
+                    ],
+                ]);
+        }
     }
 
     public function getProductsCatalogue()

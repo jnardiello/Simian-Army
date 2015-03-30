@@ -15,7 +15,6 @@ class CatalogueScraper
 {
     private $environment;
     private $client;
-    private $catalogue = [];
 
     public function __construct(Environment $environment, Client $client)
     {

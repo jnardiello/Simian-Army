@@ -2,7 +2,6 @@
 
 namespace Simian;
 
-use GuzzleHttp\Client;
 use Simian\Environment\Environment;
 
 class CatalogueScraperTest extends \PHPUnit_Framework_TestCase
@@ -26,7 +25,7 @@ class CatalogueScraperTest extends \PHPUnit_Framework_TestCase
         $this->collection->remove([]);
     }
 
-    public function testScraperWillRetrieveCatalogueProductsFromSellerId()
+    public function getStubbedScraper()
     {
         $stubbedHtml = "
             <div id='resultsCol'>
@@ -37,30 +36,60 @@ class CatalogueScraperTest extends \PHPUnit_Framework_TestCase
         ";
         // Mocking guzzle
         $client = $this->getMockBuilder('GuzzleHttp\Client')
-                       ->disableOriginalConstructor()
-                       ->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
         $request = $this->getMockBuilder('GuzzleHttp\Message\Request')
-                        ->disableOriginalConstructor()
-                        ->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
         $response = $this->getMockBuilder('GuzzleHttp\Message\Response')
-                         ->disableOriginalConstructor()
-                         ->getMock();
-        $htmlStream = $this->getMockBuilder('GuzzleHttp\Stream\Stream')
-                           ->disableOriginalConstructor()
-                           ->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $client->method('createRequest')
-               ->willReturn($request);
+            ->willReturn($request);
         $client->method('send')
-               ->willReturn($response);
+            ->willReturn($response);
         $response->method('getBody')
-                 ->willReturn($stubbedHtml);
+            ->willReturn($stubbedHtml);
 
         $scraper = new CatalogueScraper(
             $this->environment,
             $client
         );
 
+        return $scraper;
+    }
+
+    public function test_scraper_will_retrieve_catalogue_products_from_seller_id()
+    {
+        $scraper = $this->getStubbedScraper();
+        $scraper->run($this->merchantId);
+
+        $expectedProducts = [
+            [
+                'asin' => 'asin-1',
+                'active' => true,
+            ],
+            [
+                'asin' => 'asin-2',
+                'active' => true,
+            ],
+            [
+                'asin' => 'asin-3',
+                'active' => true,
+            ],
+        ];
+        $catalogue = $this->collection->findOne([
+            '_id' => $this->merchantId,
+        ]);
+
+        $this->assertEquals($expectedProducts, $catalogue['products']);
+    }
+
+    public function test_scraper_should_be_idempotent_when_adding_products()
+    {
+        $scraper = $this->getStubbedScraper();
+        $scraper->run($this->merchantId);
         $scraper->run($this->merchantId);
 
         $expectedProducts = [

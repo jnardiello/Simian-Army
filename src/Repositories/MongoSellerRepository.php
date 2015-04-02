@@ -34,10 +34,15 @@ class MongoSellerRepository
             '_id' => $sellerId,
         ]);
 
+        if (!isset($data)) {
+            return null;
+        }
+
         return new Seller(
             $data['_id'],
             $data['name'],
-            $data['email']
+            $data['email'],
+            $data['products']
         );
     }
 

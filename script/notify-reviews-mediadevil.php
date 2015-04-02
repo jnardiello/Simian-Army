@@ -2,7 +2,7 @@
 
 namespace Simian;
 
-require __DIR__ . "/../bootstrap.php";
+require __DIR__ . "/../bootstrap-tests.php";
 
 use Simian\Environment\Environment;
 use GuzzleHttp\Client;

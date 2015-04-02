@@ -6,22 +6,37 @@ require __DIR__ . "/../bootstrap.php";
 
 use Simian\Environment\Environment;
 use GuzzleHttp\Client;
+use Simian\Repositories\MongoSellerRepository;
 
 $options = getopt("", [
     'seller:'
 ]);
-$seller = $options['seller'];
+$sellerId = $options['seller'];
 
-if (!isset($seller)) {
+if (!isset($sellerId)) {
     throw new \Exception('Please add seller id');
 }
 
 $environment = new Environment('prod');
 $client = new Client();
+$sellerRepository = new MongoSellerRepository($environment);
+
+$seller = $sellerRepository->findSeller($sellerId);
+
+if (!isset($seller)) {
+    echo "Seller not present in the collection.\n\n";
+    echo "Seller name: ";
+    $sellerName = trim(fgets(STDIN));
+    echo "Seller email: ";
+    $sellerEmail = trim(fgets(STDIN));
+
+    $seller = new Seller($sellerId, $sellerName, $sellerEmail, []);
+    $sellerRepository->insertOne($seller);
+}
 
 $scraper = new CatalogueScraper(
     $environment,
     $client
 );
 
-$scraper->run($seller);
+$scraper->run($sellerId);

@@ -52,6 +52,41 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedMerchantFixtures, iterator_to_array($merchantData));
     }
 
+    public function testRepositoryIsIdempotentWhenAddingANewProduct()
+    {
+        $merchantFixture = [
+            '_id' => 'a-merchant-id',
+            'name' => 'a-merchant-name',
+            'products' => [],
+        ];
+        $expectedMerchantFixtures = [
+            'a-merchant-id' => [
+                '_id' => 'a-merchant-id',
+                'name' => 'a-merchant-name',
+                'products' => [
+                    [
+                        'asin' => 'a-product-asin',
+                        'active' => true,
+                    ],
+                ]
+            ]
+        ];
+        $this->merchantsCollection->insert($merchantFixture);
+
+        $repository = new MongoCatalogueRepository($this->environment, 'a-merchant-id');
+        $productId = 'a-product-asin';
+
+        $repository->add($productId);
+        $repository->add($productId);
+
+        $merchantDataCursor = $this->merchantsCollection->find([
+            '_id' => 'a-merchant-id'
+        ]);
+
+        $this->assertEquals(1, $merchantDataCursor->count());
+        $this->assertEquals($expectedMerchantFixtures, iterator_to_array($merchantDataCursor));
+    }
+
     public function testRepositoryCanRecoverListOfProducts()
     {
         $merchantFixture = [

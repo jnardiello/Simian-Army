@@ -28,7 +28,8 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->expectedMinotaurData = [
             '_id' => 'A3RFFOCMGATC6W',
             'name' => 'Minotaur',
-            'email' => 'callum@mediadevil.com'
+            'email' => 'callum@mediadevil.com',
+            'products' => [],
         ];
     }
 
@@ -48,9 +49,17 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->expectedMinotaurData, $seller->toArray());
     }
 
+    public function test_repository_should_return_null_if_seller_does_not_exist()
+    {
+        $sellerId = 'A3RFFOCMGATC6W';
+        $seller = $this->repository->findSeller($sellerId);
+
+        $this->assertNull($seller);
+    }
+
     public function test_repository_should_insert_new_seller()
     {
-        $seller = new Seller('a-seller-id', 'a-seller-name', 'a-seller-email');
+        $seller = new Seller('a-seller-id', 'a-seller-name', 'a-seller-email', []);
 
         $this->repository->insertOne($seller);
         $actualSeller = $this->merchantCollection->findOne(['_id' => 'a-seller-id']);
@@ -60,7 +69,7 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function test_repository_insert_should_be_idempotent()
     {
-        $seller = new Seller('a-seller-id', 'a-seller-name', 'a-seller-email');
+        $seller = new Seller('a-seller-id', 'a-seller-name', 'a-seller-email', []);
 
         $this->repository->insertOne($seller);
         $this->repository->insertOne($seller);

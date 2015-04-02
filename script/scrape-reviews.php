@@ -25,7 +25,7 @@ $sellerId = $options['seller'];
 
 // SETUP
 $environment = new Environment('prod');
-$catalogueRepository = new MongoCatalogueRepository($environment, $merchant);
+$catalogueRepository = new MongoCatalogueRepository($environment, $sellerId);
 $reviewsRepository = new MongoReviewsRepository(
     $environment,
     (new MongoMailQueueRepository($environment))
@@ -33,13 +33,13 @@ $reviewsRepository = new MongoReviewsRepository(
 $sellerRepository = new MongoSellerRepository($environment);
 
 // CONTROLLER
-$seller = $sellerRepository->findSeller($merchant);
+$seller = $sellerRepository->findSeller($sellerId);
 $client = new Client();
 $reviewsScraper = new ReviewsScraper(
     $environment,
     $client,
     $reviewsRepository
 );
-
 $products = $catalogueRepository->getProductsCatalogue();
+
 $reviewsScraper->run($seller, $products);

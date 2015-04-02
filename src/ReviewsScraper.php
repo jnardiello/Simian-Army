@@ -139,7 +139,7 @@ class ReviewsScraper
     private function buildRequestUrl($asin)
     {
         // http://www.amazon.co.uk/product-reviews/B00RXIK98K?sortBy=bySubmissionDateDescending
-        return $this->environment->get('product.uk.base.url') .
+        return $this->environment->get('uk.product.base.url') .
                $asin .
                '?sortBy=bySubmissionDateDescending';
 

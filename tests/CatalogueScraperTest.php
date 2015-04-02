@@ -52,6 +52,7 @@ class CatalogueScraperTest extends \PHPUnit_Framework_TestCase
         $response->method('getBody')
             ->willReturn($stubbedHtml);
 
+        $marketplace = new Marketplace('uk');
         $scraper = new CatalogueScraper(
             $this->environment,
             $client

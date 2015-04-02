@@ -58,7 +58,7 @@ class CatalogueScraper
     {
         // amazon.co.uk/gp/node/?marketplaceID=A1F83G8C2ARO7P&merchant=A1010PM0QYBVOG
         return $this->environment->get('uk.catalogue.base.url') .
-               'marketplaceID=' . $this->environment->get('marketplace.uk.id') .
+               'marketplaceID=' . $this->environment->get('uk.marketplace.id') .
                "&".
                'merchant=' . $merchantId;
     }

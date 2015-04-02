@@ -22,7 +22,7 @@ class MongoMailQueueRepository
         $this->environment = $environment;
         $this->queueCollection = (new \MongoClient($this->environment->get('mongo.host')))
             ->selectDB($this->environment->get('mongo.data.db'))
-            ->selectCollection($this->environment->get('mongo.queue'));
+            ->selectCollection($this->environment->get('mongo.collection.queue'));
     }
 
     public function push($type, array $dataToQueue)

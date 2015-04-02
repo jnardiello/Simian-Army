@@ -16,7 +16,7 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
         $client = new \MongoClient($this->environment->get('mongo.host'));
         $mainDb = $client->selectDB($this->environment->get('mongo.data.db'));
         $this->reviewsCollection = $mainDb->selectCollection($this->environment->get('mongo.collection.reviews'));
-        $this->queueCollection = $mainDb->selectCollection($this->environment->get('mongo.queue'));
+        $this->queueCollection = $mainDb->selectCollection($this->environment->get('mongo.collection.queue'));
         $this->queueRepository = new MongoMailQueueRepository($this->environment);
     }
 

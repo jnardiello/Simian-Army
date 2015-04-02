@@ -23,7 +23,7 @@ class ReviewsScraperTest extends AbstractScraperTest
                                     $this->queueRepository
                                 );
         $this->merchantsCollection = $client->selectDB($this->environment->get('mongo.data.db'))
-                                            ->selectCollection($this->environment->get('mongo.merchants'));
+                                            ->selectCollection($this->environment->get('mongo.collection.merchants'));
         $this->queueCollection = $client->selectDB($this->environment->get('mongo.data.db'))
                                         ->selectCollection($this->environment->get('mongo.queue'));
         $this->seller = new Seller('A3RFFOCMGATC6W', 'Minotaur Accessories', 'someemail@minotaur.com', []);

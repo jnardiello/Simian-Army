@@ -25,7 +25,7 @@ class MongoSellerRepository
         $client = new \MongoClient($environment->get('mongo.host'));
         $db = $client->selectDB($environment->get('mongo.data.db'));
 
-        $this->collection = $db->selectCollection($environment->get('mongo.merchants'));
+        $this->collection = $db->selectCollection($environment->get('mongo.collection.merchants'));
     }
 
     public function findSeller($sellerId)

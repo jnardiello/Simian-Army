@@ -24,7 +24,7 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->repository = new MongoSellerRepository($this->environment);
         $client = new \MongoClient($this->environment->get('mongo.host'));
         $this->merchantCollection = $client->selectDB($this->environment->get('mongo.data.db'))
-                                     ->selectCollection($this->environment->get('mongo.merchants'));
+                                     ->selectCollection($this->environment->get('mongo.collection.merchants'));
         $this->expectedMinotaurData = [
             '_id' => 'A3RFFOCMGATC6W',
             'name' => 'Minotaur',

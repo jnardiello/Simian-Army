@@ -12,7 +12,7 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->environment = new Environment('test');
         $client = new \MongoClient($this->environment->get('mongo.host'));
         $mainDb = $client->selectDB($this->environment->get('mongo.data.db'));
-        $this->merchantsCollection = $mainDb->selectCollection($this->environment->get('mongo.merchants'));
+        $this->merchantsCollection = $mainDb->selectCollection($this->environment->get('mongo.collection.merchants'));
     }
 
     public function tearDown()

@@ -14,7 +14,7 @@ class MongoReviewsRepository
     {
         $client = new \MongoClient($environment->get('mongo.host'));
         $mainDb = $client->selectDB($environment->get('mongo.data.db'));
-        $this->reviewsCollection = $mainDb->selectCollection($environment->get('mongo.reviews'));
+        $this->reviewsCollection = $mainDb->selectCollection($environment->get('mongo.collection.reviews'));
         $this->queueRepository = $queueRepository;
     }
 

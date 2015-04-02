@@ -16,7 +16,7 @@ class ReviewsScraperTest extends AbstractScraperTest
         $this->environment = new Environment('test');
         $client = new \MongoClient($this->environment->get('mongo.host'));
         $db = $client->selectDb($this->environment->get('mongo.data.db'));
-        $this->collection = $db->selectCollection($this->environment->get('mongo.reviews'));
+        $this->collection = $db->selectCollection($this->environment->get('mongo.collection.reviews'));
         $this->queueRepository = new MongoMailQueueRepository($this->environment);
         $this->repository = new MongoReviewsRepository(
                                     $this->environment,

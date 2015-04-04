@@ -18,11 +18,11 @@ use Simian\Repositories\MongoSellerRepository;
 */
 class Seller
 {
-    private $sellerId;
+    private $sellerIds;
 
-    public function __construct($sellerId, $sellerName, $sellerEmail, array $products)
+    public function __construct(array $sellerIds, $sellerName, $sellerEmail, array $products)
     {
-        $this->sellerId = $sellerId;
+        $this->sellerIds = $sellerIds;
         $this->name = $sellerName;
         $this->email = $sellerEmail;
         $this->products = $products;
@@ -33,9 +33,9 @@ class Seller
         return $this->name;
     }
 
-    public function getId()
+    public function getIds()
     {
-        return $this->sellerId;
+        return $this->sellerIds;
     }
 
     public function getEmail()
@@ -51,7 +51,7 @@ class Seller
     public function toArray()
     {
         return [
-            '_id' => $this->sellerId,
+            'seller_ids' => $this->getIds(),
             'name' => $this->getName(),
             'email' => $this->getEmail(),
             'products' => $this->getProducts(),

@@ -26,7 +26,7 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->merchantCollection = $client->selectDB($this->environment->get('mongo.data.db'))
                                      ->selectCollection($this->environment->get('mongo.collection.merchants'));
         $this->expectedMinotaurData = [
-            '_id' => 'A3RFFOCMGATC6W',
+            'seller_ids' => ['A3RFFOCMGATC6W'],
             'name' => 'Minotaur',
             'email' => 'callum@mediadevil.com',
             'products' => [],
@@ -44,6 +44,7 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $sellerId = 'A3RFFOCMGATC6W';
         $seller = $this->repository->findSeller($sellerId);
+        unset($this->expectedMinotaurData['_id']);
 
         $this->assertInstanceOf('Simian\Seller', $seller);
         $this->assertEquals($this->expectedMinotaurData, $seller->toArray());
@@ -59,21 +60,21 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function test_repository_should_insert_new_seller()
     {
-        $seller = new Seller('a-seller-id', 'a-seller-name', 'a-seller-email', []);
+        $seller = new Seller(['a-seller-id'], 'a-seller-name', 'a-seller-email', []);
 
         $this->repository->insertOne($seller);
-        $actualSeller = $this->merchantCollection->findOne(['_id' => 'a-seller-id']);
+        $actualSeller = $this->merchantCollection->findOne(['seller_ids' => 'a-seller-id']);
 
         $this->assertTrue(is_array($actualSeller));
     }
 
     public function test_repository_insert_should_be_idempotent()
     {
-        $seller = new Seller('a-seller-id', 'a-seller-name', 'a-seller-email', []);
+        $seller = new Seller(['a-seller-id'], 'a-seller-name', 'a-seller-email', []);
 
         $this->repository->insertOne($seller);
         $this->repository->insertOne($seller);
-        $actualSeller = $this->merchantCollection->find(['_id' => 'a-seller-id']);
+        $actualSeller = $this->merchantCollection->find(['seller_ids' => 'a-seller-id']);
 
         $this->assertEquals(1, $actualSeller->count());
     }

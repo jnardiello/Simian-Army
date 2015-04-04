@@ -31,7 +31,7 @@ class MongoSellerRepository
     public function findSeller($sellerId)
     {
         $data = $this->collection->findOne([
-            '_id' => $sellerId,
+            'seller_ids' => $sellerId,
         ]);
 
         if (!isset($data)) {
@@ -39,7 +39,7 @@ class MongoSellerRepository
         }
 
         return new Seller(
-            $data['_id'],
+            $data['seller_ids'],
             $data['name'],
             $data['email'],
             $data['products']
@@ -49,7 +49,7 @@ class MongoSellerRepository
     public function insertOne(Seller $seller)
     {
         $alreadyThere = $this->collection->findOne([
-            '_id' => $seller->getId(),
+            'seller_ids' => $seller->getIds(),
         ]);
 
         if (!isset($alreadyThere)) {

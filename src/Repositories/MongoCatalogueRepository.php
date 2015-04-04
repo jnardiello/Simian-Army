@@ -32,7 +32,7 @@ class MongoCatalogueRepository
             'marketplace' => $this->marketplace->getId(),
         ];
 
-        $seller = $this->collection->findOne(['_id' => $this->merchantId]);
+        $seller = $this->collection->findOne(['seller_ids' => $this->merchantId]);
 
         foreach ($seller['products'] as $product) {
             if ($product['asin'] == $asin && $product['marketplace'] == $this->marketplace->getId()) {
@@ -43,7 +43,7 @@ class MongoCatalogueRepository
         if (!$alreadyInCatalogue) {
             $this->collection->findAndModify(
                 [
-                    '_id' => $this->merchantId
+                    'seller_ids' => $this->merchantId
                 ],
                 [
                     '$push' => [
@@ -55,14 +55,12 @@ class MongoCatalogueRepository
 
     public function getProductsCatalogue()
     {
-        $catalogueCursor = $this->collection->find([
-            '_id' => $this->merchantId
+        $catalogue = $this->collection->findOne([
+            'seller_ids' => $this->merchantId
         ]);
-
-        $catalogue = iterator_to_array($catalogueCursor);
-
         $results = [];
-        foreach ($catalogue[$this->merchantId]['products'] as $product) {
+
+        foreach ($catalogue['products'] as $product) {
             $results[] = $product['asin'];
         }
 

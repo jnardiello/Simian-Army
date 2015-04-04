@@ -23,16 +23,25 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->merchantsCollection->remove([]);
     }
 
-    public function testRepositoryCanAddProductToMerchant()
+    public function testRepositoryCanAddProductToMerchantWithMultipleIds()
     {
+        $mongoId = new \MongoId();
         $merchantFixture = [
-            '_id' => 'a-merchant-id',
+            '_id' => $mongoId,
+            'seller_ids' => [
+                'a-merchant-id',
+                'another-merchant-id',
+            ],
             'name' => 'a-merchant-name',
             'products' => [],
         ];
         $expectedMerchantFixtures = [
-            'a-merchant-id' => [
-                '_id' => 'a-merchant-id',
+            $mongoId->__toString() => [
+                '_id' => $mongoId,
+                'seller_ids' => [
+                    'a-merchant-id',
+                    'another-merchant-id',
+                ],
                 'name' => 'a-merchant-name',
                 'products' => [
                     [
@@ -51,21 +60,24 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
         $repository->add($productId);
 
         $merchantData = $this->merchantsCollection->find([
-            '_id' => 'a-merchant-id'
+            '_id' => $mongoId,
         ]);
         $this->assertEquals($expectedMerchantFixtures, iterator_to_array($merchantData));
     }
 
     public function testRepositoryIsIdempotentWhenAddingANewProduct()
     {
+        $mongoId = new \MongoId();
         $merchantFixture = [
-            '_id' => 'a-merchant-id',
+            '_id' => $mongoId,
+            'seller_ids' => ['a-merchant-id'],
             'name' => 'a-merchant-name',
             'products' => [],
         ];
         $expectedMerchantFixtures = [
-            'a-merchant-id' => [
-                '_id' => 'a-merchant-id',
+            $mongoId->__toString() => [
+                '_id' => $mongoId,
+                'seller_ids' => ['a-merchant-id'],
                 'name' => 'a-merchant-name',
                 'products' => [
                     [
@@ -85,7 +97,7 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
         $repository->add($productId);
 
         $merchantDataCursor = $this->merchantsCollection->find([
-            '_id' => 'a-merchant-id'
+            'seller_ids' => 'a-merchant-id'
         ]);
 
         $this->assertEquals(1, $merchantDataCursor->count());
@@ -94,8 +106,10 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function testRepositoryCanRecoverListOfProducts()
     {
+        $mongoId = new \MongoId();
         $merchantFixture = [
-            '_id' => 'a-merchant-id',
+            '_id' => $mongoId,
+            'seller_ids' => ['a-merchant-id'],
             'name' => 'a-merchant-name',
             'products' => [],
         ];
@@ -113,14 +127,17 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function test_repository_will_add_two_products_with_same_asin_but_different_marketplace()
     {
+        $mongoId = new \MongoId();
         $merchantFixture = [
-            '_id' => 'a-merchant-id',
+            '_id' => $mongoId,
+            'seller_ids' => ['a-merchant-id'],
             'name' => 'a-merchant-name',
             'products' => [],
         ];
         $expectedMerchantFixtures = [
-            'a-merchant-id' => [
-                '_id' => 'a-merchant-id',
+            $mongoId->__toString() => [
+                '_id' => $mongoId,
+                'seller_ids' => ['a-merchant-id'],
                 'name' => 'a-merchant-name',
                 'products' => [
                     [
@@ -146,7 +163,7 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
         $repositoryDE->add($productId);
 
         $merchantDataCursor = $this->merchantsCollection->find([
-            '_id' => 'a-merchant-id'
+            'seller_ids' => 'a-merchant-id'
         ]);
 
         $this->assertEquals(1, $merchantDataCursor->count());

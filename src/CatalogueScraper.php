@@ -6,6 +6,7 @@ use Simian\Environment\Environment;
 use GuzzleHttp\Client;
 use Symfony\Component\DomCrawler\Crawler;
 use Simian\Repositories\MongoCatalogueRepository;
+use Simian\Marketplace;
 
 /**
  * Class CatalogueScraper
@@ -16,15 +17,16 @@ class CatalogueScraper
     private $environment;
     private $client;
 
-    public function __construct(Environment $environment, Client $client)
+    public function __construct(Environment $environment, Client $client, Marketplace $marketplace)
     {
         $this->environment = $environment;
         $this->client = $client;
+        $this->marketplace = $marketplace;
     }
 
     public function run($merchantId, $url = null)
     {
-        $this->repository = new MongoCatalogueRepository($this->environment, $merchantId);
+        $this->repository = new MongoCatalogueRepository($this->environment, $merchantId, $this->marketplace->getId());
 
         if (isset($merchantId) && !isset($url)) {
             $url = $this->buildRequestUrl($merchantId);

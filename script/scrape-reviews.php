@@ -2,7 +2,7 @@
 
 namespace Simian;
 
-require __DIR__ . "/../bootstrap-tests.php";
+require __DIR__ . "/../bootstrap.php";
 
 use Simian\Environment\Environment;
 use GuzzleHttp\Client;
@@ -12,16 +12,19 @@ use Simian\Repositories\MongoReviewsRepository;
 use Mailgun\Mailgun;
 use Simian\Repositories\MongoSellerRepository;
 
-$options = getopt("", [
-    'seller:',
-]);
-$marketplaceId = "";
-$sellerId = $options['seller'];
+/* $options = getopt("", [ */
+/*     'seller:', */
+/* ]); */
+/* $sellerId = $options['seller']; */
 
-    /* "A1010PM0QYBVOG", */
+$marketplaceId = "uk";
+$seller = [
+    'mediadevil' => "A1010PM0QYBVOG",
+];
+$sellerId = $seller['mediadevil'];
+
     /* "A3RFFOCMGATC6W", */
     /* "A2CODDGMAUR50 */
-//$mailgun = new Mailgun('key-f33b7d4556b361eeba543eeca496654b');
 
 // SETUP
 $environment = new Environment('prod');

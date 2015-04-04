@@ -3,6 +3,7 @@
 namespace Simian\Repositories;
 
 use Simian\Environment\Environment;
+use Simian\Marketplace;
 
 class MongoCatalogueRepository
 {
@@ -10,10 +11,11 @@ class MongoCatalogueRepository
     private $merchantId;
     private $collection;
 
-    public function __construct(Environment $environment, $merchantId)
+    public function __construct(Environment $environment, $merchantId, Marketplace $marketplace)
     {
         $this->environment = $environment;
         $this->merchantId = $merchantId;
+        $this->marketplace = $marketplace;
         $client = new \MongoClient($environment->get('mongo.host'));
         $mainDb = $client->selectDB($environment->get('mongo.data.db'));
         $this->collection = $mainDb->selectCollection(
@@ -27,14 +29,10 @@ class MongoCatalogueRepository
         $newProduct = [
             'asin' => $asin,
             'active' => true,
+            'marketplace' => $this->marketplace->getId(),
         ];
 
         $seller = $this->collection->findOne(['_id' => $this->merchantId]);
-
-        if (isset($seller['products'])) {
-            /* var_dump($seller); */
-            /* die(); */
-        }
 
         foreach ($seller['products'] as $product) {
             if ($product['asin'] == $asin) {

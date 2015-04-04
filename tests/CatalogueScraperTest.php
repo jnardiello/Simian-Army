@@ -17,7 +17,7 @@ class CatalogueScraperTest extends \PHPUnit_Framework_TestCase
         $db = $client->selectDb($this->environment->get('mongo.data.db'));
         $this->collection = $db->selectCollection($this->environment->get('mongo.collection.merchants'));
         $this->collection->insert([
-            '_id' => $this->seller->getId(),
+            'seller_ids' => $this->seller->getId(),
             'name' => 'Mediadevil',
             'products' => [],
         ]);
@@ -87,7 +87,7 @@ class CatalogueScraperTest extends \PHPUnit_Framework_TestCase
             ],
         ];
         $catalogue = $this->collection->findOne([
-            '_id' => $this->seller->getId(),
+            'seller_ids' => $this->seller->getId(),
         ]);
 
         $this->assertEquals($expectedProducts, $catalogue['products']);
@@ -114,7 +114,7 @@ class CatalogueScraperTest extends \PHPUnit_Framework_TestCase
             ],
         ];
         $catalogue = $this->collection->findOne([
-            '_id' => $this->merchantId,
+            'seller_ids' => $this->merchantId,
         ]);
 
         $this->assertEquals($expectedProducts, $catalogue['products']);

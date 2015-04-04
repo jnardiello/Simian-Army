@@ -12,12 +12,12 @@ class CatalogueScraperTest extends \PHPUnit_Framework_TestCase
     {
         $this->environment = new Environment('test');
         $this->marketplace = new Marketplace('uk', $this->environment);
-        $this->seller = new Seller("A1010PM0QYBVOG", 'MediaDevil', 'email@mediadevil.com', []);
+        $this->seller = new Seller(["A1010PM0QYBVOG"], 'MediaDevil', 'email@mediadevil.com', []);
         $client = new \MongoClient();
         $db = $client->selectDb($this->environment->get('mongo.data.db'));
         $this->collection = $db->selectCollection($this->environment->get('mongo.collection.merchants'));
         $this->collection->insert([
-            'seller_ids' => $this->seller->getId(),
+            'seller_ids' => $this->seller->getIds(),
             'name' => 'Mediadevil',
             'products' => [],
         ]);
@@ -67,7 +67,7 @@ class CatalogueScraperTest extends \PHPUnit_Framework_TestCase
     public function test_scraper_will_retrieve_catalogue_products_from_seller_id()
     {
         $scraper = $this->getStubbedScraper();
-        $scraper->run($this->seller->getId());
+        $scraper->run($this->seller->getIds()[0]);
 
         $expectedProducts = [
             [
@@ -87,7 +87,7 @@ class CatalogueScraperTest extends \PHPUnit_Framework_TestCase
             ],
         ];
         $catalogue = $this->collection->findOne([
-            'seller_ids' => $this->seller->getId(),
+            'seller_ids' => $this->seller->getIds(),
         ]);
 
         $this->assertEquals($expectedProducts, $catalogue['products']);

@@ -4,6 +4,7 @@ namespace Simian;
 
 use Simian\Environment\Environment;
 use Simian\Seller;
+use Simian\Marketplace;
 
 class CatalogueScraperTest extends \PHPUnit_Framework_TestCase
 {

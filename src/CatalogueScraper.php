@@ -26,7 +26,7 @@ class CatalogueScraper
 
     public function run($merchantId, $url = null)
     {
-        $this->repository = new MongoCatalogueRepository($this->environment, $merchantId, $this->marketplace->getId());
+        $this->repository = new MongoCatalogueRepository($this->environment, $merchantId, $this->marketplace);
 
         if (isset($merchantId) && !isset($url)) {
             $url = $this->buildRequestUrl($merchantId);

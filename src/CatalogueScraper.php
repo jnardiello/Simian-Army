@@ -43,7 +43,7 @@ class CatalogueScraper
 
         $nextLink = $crawler->filterXPath('(//a[@id="pagnNextLink"]/@href)[1]');
         if ($nextLink->count()) {
-            $this->run($merchantId, $this->environment->get('uk.main.base.url') . $nextLink->text());
+            $this->run($merchantId, $this->marketplace->getBaseUrl() . $nextLink->text());
         }
     }
 

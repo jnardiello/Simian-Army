@@ -28,4 +28,9 @@ class Marketplace
     {
         return $this->environment->get("{$this->marketplacePlaceholder}.marketplace.id");
     }
+
+    public function getCatalogueBaseUrl()
+    {
+        return $this->environment->get("{$this->marketplacePlaceholder}.catalogue.base.url");
+    }
 }

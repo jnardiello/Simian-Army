@@ -35,7 +35,7 @@ class CatalogueScraper
         $stream = $this->getHtmlStream($url);
         $crawler = new Crawler((string) $stream);
 
-        $productsList = $crawler->filterXPath('//div[@id="resultsCol"]//li/@data-asin')
+        $productsList = $crawler->filterXPath('//li/@data-asin')
                                 ->each(function($document) {
                                     $asin = $document->text();
                                     $this->repository->add($asin);
@@ -59,8 +59,8 @@ class CatalogueScraper
     private function buildRequestUrl($merchantId)
     {
         // amazon.co.uk/gp/node/?marketplaceID=A1F83G8C2ARO7P&merchant=A1010PM0QYBVOG
-        return $this->environment->get('uk.catalogue.base.url') .
-               'marketplaceID=' . $this->environment->get('uk.marketplace.id') .
+        return $this->marketplace->getCatalogueBaseUrl() . 
+               'marketplaceID=' . $this->marketplace->getId() .
                "&".
                'merchant=' . $merchantId;
     }

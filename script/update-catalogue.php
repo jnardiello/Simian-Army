@@ -9,9 +9,11 @@ use GuzzleHttp\Client;
 use Simian\Repositories\MongoSellerRepository;
 
 $options = getopt("", [
-    'seller:'
+    'seller:',
+    'marketplace:'
 ]);
 $sellerId = $options['seller'];
+$marketplacePlaceholder = $options['marketplace'];
 
 if (!isset($sellerId)) {
     throw new \Exception('Please add seller id');
@@ -20,6 +22,7 @@ if (!isset($sellerId)) {
 $environment = new Environment('prod');
 $client = new Client();
 $sellerRepository = new MongoSellerRepository($environment);
+$marketplace = new Marketplace($marketplacePlaceholder, $environment);
 
 $seller = $sellerRepository->findSeller($sellerId);
 
@@ -36,7 +39,8 @@ if (!isset($seller)) {
 
 $scraper = new CatalogueScraper(
     $environment,
-    $client
+    $client,
+    $marketplace
 );
 
 $scraper->run($sellerId);

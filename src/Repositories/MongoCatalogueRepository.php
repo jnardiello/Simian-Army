@@ -35,7 +35,7 @@ class MongoCatalogueRepository
         $seller = $this->collection->findOne(['_id' => $this->merchantId]);
 
         foreach ($seller['products'] as $product) {
-            if ($product['asin'] == $asin) {
+            if ($product['asin'] == $asin && $product['marketplace'] == $this->marketplace->getId()) {
                 $alreadyInCatalogue = true;
             }
         }

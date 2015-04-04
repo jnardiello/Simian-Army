@@ -26,7 +26,7 @@ class ReviewsScraperTest extends AbstractScraperTest
                                             ->selectCollection($this->environment->get('mongo.collection.merchants'));
         $this->queueCollection = $client->selectDB($this->environment->get('mongo.data.db'))
                                         ->selectCollection($this->environment->get('mongo.collection.queue'));
-        $this->seller = new Seller(['A3RFFOCMGATC6W'], 'Minotaur Accessories', 'someemail@minotaur.com', []);
+        $this->seller = new Seller(['A3RFFOCMGATC6W'], 'Minotaur Accessories', 'someemail@minotaur.com', [], 'A3RFFOCMGATC6W');
     }
 
     public function tearDown()
@@ -130,7 +130,8 @@ class ReviewsScraperTest extends AbstractScraperTest
         ]);
 
         $persistedReview = $this->collection->findOne();
-        $this->assertEquals(['A3RFFOCMGATC6W'], $persistedReview['seller_id']);
+
+        $this->assertEquals('A3RFFOCMGATC6W', $persistedReview['seller_id']);
         $this->assertEquals('Minotaur Accessories', $persistedReview['seller_name']);
     }
 

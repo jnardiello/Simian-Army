@@ -74,7 +74,7 @@ class ReviewsScraper
                     $review['asin'] = $asin;
                     $review['permalink'] = $this->exists('(//div/span/a/@href)[1]', $doc);
                     $review['text'] = $this->exists('//div[@class="reviewText"]', $doc);
-                    $review['seller_id'] = $this->seller->getIds();
+                    $review['seller_id'] = $this->seller->getOriginalId();
                     $review['seller_name'] = $this->seller->getName();
 
                     $review = ReviewBuilder::aReviewFromArray($review);

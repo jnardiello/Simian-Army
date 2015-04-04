@@ -20,8 +20,9 @@ class Seller
 {
     private $sellerIds;
 
-    public function __construct(array $sellerIds, $sellerName, $sellerEmail, array $products)
+    public function __construct(array $sellerIds, $sellerName, $sellerEmail, array $products, $originalId = null)
     {
+        $this->originalId = $originalId;
         $this->sellerIds = $sellerIds;
         $this->name = $sellerName;
         $this->email = $sellerEmail;
@@ -31,6 +32,11 @@ class Seller
     public function getName()
     {
         return $this->name;
+    }
+
+    public function getOriginalId()
+    {
+        return $this->originalId;
     }
 
     public function getIds()

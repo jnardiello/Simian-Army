@@ -16,5 +16,6 @@ class MarketplaceTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals("http://amazon.co.uk", $marketplace->getBaseUrl());
         $this->assertEquals("A1F83G8C2ARO7P", $marketplace->getId());
+        $this->assertEquals("uk", $marketplace->getSlug());
     }
 }

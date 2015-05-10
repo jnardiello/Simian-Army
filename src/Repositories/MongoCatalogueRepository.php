@@ -29,21 +29,28 @@ class MongoCatalogueRepository
         $newProduct = [
             'asin' => $asin,
             'active' => true,
-            'marketplace' => $this->marketplace->getId(),
+            'marketplace' => $this->marketplace->getSlug(),
         ];
 
-        $seller = $this->collection->findOne(['seller_ids' => $this->merchantId]);
+        $seller = $this->collection->findOne([
+            "seller_ids.{$this->marketplace->getSlug()}" => $this->merchantId
+        ]);
 
-        foreach ($seller['products'] as $product) {
-            if ($product['asin'] == $asin && $product['marketplace'] == $this->marketplace->getId()) {
-                $alreadyInCatalogue = true;
+        if (!empty($seller['products'])) {
+            foreach ($seller['products'] as $product) {
+                if (
+                    $product['asin'] == $asin && 
+                    $product['marketplace'] == $this->marketplace->getSlug()
+                ) {
+                    $alreadyInCatalogue = true;
+                }
             }
         }
 
         if (!$alreadyInCatalogue) {
             $this->collection->findAndModify(
                 [
-                    'seller_ids' => $this->merchantId
+                    "seller_ids.{$this->marketplace->getSlug()}" => $this->merchantId
                 ],
                 [
                     '$push' => [
@@ -56,7 +63,7 @@ class MongoCatalogueRepository
     public function getProductsCatalogue()
     {
         $catalogue = $this->collection->findOne([
-            'seller_ids' => $this->merchantId
+            "seller_ids.{$this->marketplace->getSlug()}" => $this->merchantId
         ]);
         $results = [];
 

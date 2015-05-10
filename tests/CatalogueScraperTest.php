@@ -12,7 +12,14 @@ class CatalogueScraperTest extends \PHPUnit_Framework_TestCase
     {
         $this->environment = new Environment('test');
         $this->marketplace = new Marketplace('uk', $this->environment);
-        $this->seller = new Seller(["A1010PM0QYBVOG"], 'MediaDevil', 'email@mediadevil.com', []);
+        $this->seller = new Seller(
+            [
+                "uk" => "A1010PM0QYBVOG"
+            ], 
+            'MediaDevil', 
+            'email@mediadevil.com', 
+            []
+        );
         $client = new \MongoClient();
         $db = $client->selectDb($this->environment->get('mongo.data.db'));
         $this->collection = $db->selectCollection($this->environment->get('mongo.collection.merchants'));
@@ -67,23 +74,25 @@ class CatalogueScraperTest extends \PHPUnit_Framework_TestCase
     public function test_scraper_will_retrieve_catalogue_products_from_seller_id()
     {
         $scraper = $this->getStubbedScraper();
-        $scraper->run($this->seller->getIds()[0]);
+        $scraper->run(
+            $this->seller->getIds()[$this->marketplace->getSlug()]
+        );
 
         $expectedProducts = [
             [
                 'asin' => 'asin-1',
                 'active' => true,
-                'marketplace' => 'A1F83G8C2ARO7P',
+                'marketplace' => 'uk',
             ],
             [
                 'asin' => 'asin-2',
                 'active' => true,
-                'marketplace' => 'A1F83G8C2ARO7P',
+                'marketplace' => 'uk',
             ],
             [
                 'asin' => 'asin-3',
                 'active' => true,
-                'marketplace' => 'A1F83G8C2ARO7P',
+                'marketplace' => 'uk',
             ],
         ];
         $catalogue = $this->collection->findOne([

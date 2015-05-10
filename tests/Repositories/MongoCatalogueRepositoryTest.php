@@ -23,14 +23,14 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->merchantsCollection->remove([]);
     }
 
-    public function testRepositoryCanAddProductToMerchantWithMultipleIds()
+    public function test_repository_can_add_product_to_merchant_with_multiple_ids()
     {
         $mongoId = new \MongoId();
         $merchantFixture = [
             '_id' => $mongoId,
             'seller_ids' => [
-                'a-merchant-id',
-                'another-merchant-id',
+                $this->marketplaceUK->getSlug() => 'a-merchant-id',
+                $this->marketplaceDE->getSlug() => 'another-merchant-id',
             ],
             'name' => 'a-merchant-name',
             'products' => [],
@@ -39,15 +39,15 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
             $mongoId->__toString() => [
                 '_id' => $mongoId,
                 'seller_ids' => [
-                    'a-merchant-id',
-                    'another-merchant-id',
+                    'uk' => 'a-merchant-id',
+                    'de' => 'another-merchant-id',
                 ],
                 'name' => 'a-merchant-name',
                 'products' => [
                     [
                         'asin' => 'a-product-asin',
                         'active' => true,
-                        'marketplace' => 'A1F83G8C2ARO7P',
+                        'marketplace' => 'uk',
                     ],
                 ]
             ]
@@ -55,8 +55,8 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->merchantsCollection->insert($merchantFixture);
 
         $repository = new MongoCatalogueRepository($this->environment, 'a-merchant-id', $this->marketplaceUK);
-        $productId = 'a-product-asin';
 
+        $productId = 'a-product-asin';
         $repository->add($productId);
 
         $merchantData = $this->merchantsCollection->find([
@@ -65,25 +65,29 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedMerchantFixtures, iterator_to_array($merchantData));
     }
 
-    public function testRepositoryIsIdempotentWhenAddingANewProduct()
+    public function test_repository_is_idempotent_when_adding_new_product()
     {
         $mongoId = new \MongoId();
         $merchantFixture = [
             '_id' => $mongoId,
-            'seller_ids' => ['a-merchant-id'],
+            'seller_ids' => [
+                'uk' => 'a-merchant-id'
+            ],
             'name' => 'a-merchant-name',
             'products' => [],
         ];
         $expectedMerchantFixtures = [
             $mongoId->__toString() => [
                 '_id' => $mongoId,
-                'seller_ids' => ['a-merchant-id'],
+                'seller_ids' => [
+                    'uk' => 'a-merchant-id'
+                ],
                 'name' => 'a-merchant-name',
                 'products' => [
                     [
                         'asin' => 'a-product-asin',
                         'active' => true,
-                        'marketplace' => 'A1F83G8C2ARO7P',
+                        'marketplace' => 'uk',
                     ],
                 ]
             ]
@@ -97,19 +101,21 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
         $repository->add($productId);
 
         $merchantDataCursor = $this->merchantsCollection->find([
-            'seller_ids' => 'a-merchant-id'
+            "seller_ids.{$this->marketplaceUK->getSlug()}" => 'a-merchant-id'
         ]);
 
         $this->assertEquals(1, $merchantDataCursor->count());
         $this->assertEquals($expectedMerchantFixtures, iterator_to_array($merchantDataCursor));
     }
 
-    public function testRepositoryCanRecoverListOfProducts()
+    public function test_repository_can_recover_list_of_products_per_marketplace()
     {
         $mongoId = new \MongoId();
         $merchantFixture = [
             '_id' => $mongoId,
-            'seller_ids' => ['a-merchant-id'],
+            'seller_ids' => [
+                'uk' => 'a-merchant-id'
+            ],
             'name' => 'a-merchant-name',
             'products' => [],
         ];
@@ -130,25 +136,31 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
         $mongoId = new \MongoId();
         $merchantFixture = [
             '_id' => $mongoId,
-            'seller_ids' => ['a-merchant-id'],
+            'seller_ids' => [
+                'uk' => 'a-merchant-id',
+                'de' => 'a-merchant-id',
+            ],
             'name' => 'a-merchant-name',
             'products' => [],
         ];
         $expectedMerchantFixtures = [
             $mongoId->__toString() => [
                 '_id' => $mongoId,
-                'seller_ids' => ['a-merchant-id'],
+                'seller_ids' => [
+                    'uk' => 'a-merchant-id',
+                    'de' => 'a-merchant-id',
+                ],
                 'name' => 'a-merchant-name',
                 'products' => [
                     [
                         'asin' => 'a-product-asin',
                         'active' => true,
-                        'marketplace' => 'A1F83G8C2ARO7P',
+                        'marketplace' => 'uk',
                     ],
                     [
                         'asin' => 'a-product-asin',
                         'active' => true,
-                        'marketplace' => 'A1PA6795UKMFR9',
+                        'marketplace' => 'de',
                     ],
                 ]
             ]
@@ -163,10 +175,9 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
         $repositoryDE->add($productId);
 
         $merchantDataCursor = $this->merchantsCollection->find([
-            'seller_ids' => 'a-merchant-id'
+            'seller_ids.uk' => 'a-merchant-id'
         ]);
 
-        $this->assertEquals(1, $merchantDataCursor->count());
         $this->assertEquals($expectedMerchantFixtures, iterator_to_array($merchantDataCursor));
     }
 }

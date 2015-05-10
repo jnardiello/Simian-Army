@@ -33,4 +33,9 @@ class Marketplace
     {
         return $this->environment->get("{$this->marketplacePlaceholder}.catalogue.base.url");
     }
+
+    public function getSlug()
+    {
+        return $this->marketplacePlaceholder;
+    }
 }

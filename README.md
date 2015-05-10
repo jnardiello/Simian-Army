@@ -1,4 +1,4 @@
-# Mysql
+# Simian Army
 
-both locale and atlas
-root:simian123
+Simian army (name shamelessly stolen from netflix) is a framework to crawl and extract data from Amazon.
+To see usage examples check `script`.

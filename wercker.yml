@@ -5,6 +5,9 @@ build:
       # A custom script step, name value is used in the UI
       # and the code value contains the command that get executed
       - script:
+          name: updating packages
+          code: sudo apt-get update
+      - script:
           name: setting up environment
           code: sudo apt-get install php-pear php5-dev php5-curl
       - script:

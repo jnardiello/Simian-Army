@@ -28,6 +28,7 @@ class ReviewsScraperTest extends AbstractScraperTest
                                         ->selectCollection($this->environment->get('mongo.collection.queue'));
         $this->seller = new Seller(['uk' => 'A3RFFOCMGATC6W'], 'Minotaur Accessories', 'someemail@minotaur.com', []);
         $this->seller->setOriginalId('A3RFFOCMGATC6W');
+        $this->marketplace = new Marketplace('uk', $this->environment);
     }
 
     public function tearDown()
@@ -44,7 +45,8 @@ class ReviewsScraperTest extends AbstractScraperTest
         $reviewsScraper = new ReviewsScraper(
             $this->environment,
             $this->getStubbedHttpClient($stubbedHtml),
-            $this->repository
+            $this->repository,
+            $this->marketplace
         );
 
         $reviewsScraper->run($this->seller, [
@@ -64,7 +66,8 @@ class ReviewsScraperTest extends AbstractScraperTest
         $reviewsScraper = new ReviewsScraper(
             $this->environment,
             $client,
-            $this->repository
+            $this->repository,
+            $this->marketplace
         );
 
         $reviewsJsonString = file_get_contents(__DIR__ . "/fixtures/json/reviews.json");
@@ -86,7 +89,8 @@ class ReviewsScraperTest extends AbstractScraperTest
         $reviewsScraper = new ReviewsScraper(
             $this->environment,
             $this->getStubbedHttpClient($stubbedHtml),
-            $this->repository
+            $this->repository,
+            $this->marketplace
         );
 
         $reviewsScraper->run($this->seller, [
@@ -104,7 +108,8 @@ class ReviewsScraperTest extends AbstractScraperTest
         $reviewsScraper = new ReviewsScraper(
             $this->environment,
             $this->getStubbedHttpClient($stubbedHtml),
-            $this->repository
+            $this->repository,
+            $this->marketplace
         );
 
         $reviewsScraper->run($this->seller, [
@@ -123,7 +128,8 @@ class ReviewsScraperTest extends AbstractScraperTest
         $reviewsScraper = new ReviewsScraper(
             $this->environment,
             $this->getStubbedHttpClient($stubbedHtml),
-            $this->repository
+            $this->repository,
+            $this->marketplace
         );
 
         $reviewsScraper->run($this->seller, [

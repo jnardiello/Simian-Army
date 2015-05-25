@@ -8,6 +8,7 @@
 
 namespace Simian\Reviews;
 
+use Simian\Marketplace;
 
 /**
 * Class Review
@@ -18,6 +19,7 @@ class Review
 {
     private $id;
     private $sellerId;
+    private $marketplace;
     private $sellerName;
     private $productTitle;
     private $productLink;
@@ -27,6 +29,16 @@ class Review
     {
         $this->sellerId = $sellerId;
         $this->sellerName = $sellerName;
+    }
+
+    public function setMarketplace(Marketplace $marketplace)
+    {
+        $this->marketplace = $marketplace;
+    }
+
+    public function getMarketplace()
+    {
+        return $this->marketplace;
     }
 
     public function setProduct($productTitle, $productLink)

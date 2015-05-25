@@ -7,6 +7,7 @@ use Simian\Environment\Environment;
 use Simian\Repositories\MongoReviewsRepository;
 use Simian\Reviews\ReviewBuilder;
 use Simian\Seller;
+use Simian\Marketplace;
 use Symfony\Component\DomCrawler\Crawler;
 use Mailgun\Mailgun;
 
@@ -26,11 +27,12 @@ class ReviewsScraper
         'swSprite s_star_1_0 ' => 1,
             ];
 
-    public function __construct(Environment $environment, Client $client, MongoReviewsRepository $repository)
+    public function __construct(Environment $environment, Client $client, MongoReviewsRepository $repository, Marketplace $marketplace)
     {
         $this->environment = $environment;
         $this->client = $client;
         $this->repository = $repository;
+        $this->marketplace = $marketplace;
     }
 
     public function run(Seller $seller, array $asins = [])
@@ -45,7 +47,7 @@ class ReviewsScraper
 
     private function persistReviewsPage($asin, $url, $currentDepth = null, $maxDepth = null)
     {
-        /* var_dump("Scraping {$asin}"); */
+        var_dump("Scraping {$asin}");
         $stream = $this->getHtmlStream($url);
         $crawler = new Crawler((string) $stream);
         $this->mainProductLink = $this->exists('(//h1/div/a/@href)[1]', $crawler);
@@ -76,13 +78,14 @@ class ReviewsScraper
                     $review['text'] = $this->exists('//div[@class="reviewText"]', $doc);
                     $review['seller_id'] = $this->seller->getOriginalId();
                     $review['seller_name'] = $this->seller->getName();
+                    $review['marketplace'] = $this->marketplace->getSlug();
 
                     $review = ReviewBuilder::aReviewFromArray($review);
 
                     $this->repository->addReviewToAsin($review, $asin);
             });
 
-        $nextLink = $crawler->filterXPath("(//span[@class='paging']/a[contains(text(), 'Next ›')]/@href)[1]");
+        $nextLink = $crawler->filterXPath("(//span[@class='paging']/a[contains(text(), 'Successivo ›')]/@href)[1]");
         if ($nextLink->count()) {
             $this->persistReviewsPage($asin, $nextLink->text(), ++$currentDepth, $maxDepth);
         }
@@ -139,7 +142,7 @@ class ReviewsScraper
     private function buildRequestUrl($asin)
     {
         // http://www.amazon.co.uk/product-reviews/B00RXIK98K?sortBy=bySubmissionDateDescending
-        return $this->environment->get('uk.product.base.url') .
+        return $this->environment->get("{$this->marketplace->getSlug()}.product.base.url") .
                $asin .
                '?sortBy=bySubmissionDateDescending';
 

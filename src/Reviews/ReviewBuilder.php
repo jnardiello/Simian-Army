@@ -66,6 +66,7 @@ class ReviewBuilder
             ->with('text', $review['text'])
             ->with('review_title', $review['review_title'])
             ->with('review_author', $review['review_author'])
+            ->with('marketplace', $review['marketplace'])
             ->build();
 
         return $review;

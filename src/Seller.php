@@ -20,9 +20,8 @@ class Seller
 {
     private $sellerIds;
 
-    public function __construct(array $sellerIds, $sellerName, $sellerEmail, array $products, $originalId = null)
+    public function __construct(array $sellerIds, $sellerName, $sellerEmail, array $products)
     {
-        $this->originalId = $originalId;
         $this->sellerIds = $sellerIds;
         $this->name = $sellerName;
         $this->email = $sellerEmail;
@@ -52,6 +51,11 @@ class Seller
     public function getProducts()
     {
         return $this->products;
+    }
+
+    public function setOriginalId($originalId)
+    {
+        $this->originalId = $originalId;
     }
 
     public function toArray()

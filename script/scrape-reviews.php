@@ -30,8 +30,8 @@ if (!isset($options['name']) || !isset($options['marketplace'])) {
 $sellerName = $options['name'];
 $marketplace = new Marketplace($options['marketplace'], $environment);
 
-$seller = $sellerRepository->findByName($sellerName);
-$sellerIds = $seller->getIds();
+$seller = $sellerRepository->findByName($sellerName)
+    ->setOriginalId($seller->getIds()[$marketplace->getSlug()]);
 
 // Generating Repositories for products and reviews
 $catalogueRepository = new MongoCatalogueRepository(

@@ -26,7 +26,8 @@ class ReviewsScraperTest extends AbstractScraperTest
                                             ->selectCollection($this->environment->get('mongo.collection.sellers'));
         $this->queueCollection = $client->selectDB($this->environment->get('mongo.data.db'))
                                         ->selectCollection($this->environment->get('mongo.collection.queue'));
-        $this->seller = new Seller(['A3RFFOCMGATC6W'], 'Minotaur Accessories', 'someemail@minotaur.com', [], 'A3RFFOCMGATC6W');
+        $this->seller = new Seller(['uk' => 'A3RFFOCMGATC6W'], 'Minotaur Accessories', 'someemail@minotaur.com', []);
+        $this->seller->setOriginalId('A3RFFOCMGATC6W');
     }
 
     public function tearDown()

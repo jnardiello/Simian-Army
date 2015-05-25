@@ -10,6 +10,7 @@ namespace Simian\Repositories;
 
 use Simian\Environment\Environment;
 use Simian\Seller;
+use Simian\Marketplace;
 
 /**
 * Class MongoSellerRepositoryTest
@@ -23,27 +24,30 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->environment = new Environment('test');
         $this->repository = new MongoSellerRepository($this->environment);
         $client = new \MongoClient($this->environment->get('mongo.host'));
-        $this->merchantCollection = $client->selectDB($this->environment->get('mongo.data.db'))
-                                     ->selectCollection($this->environment->get('mongo.collection.merchants'));
+        $this->sellersCollection = $client->selectDB($this->environment->get('mongo.data.db'))
+                                     ->selectCollection($this->environment->get('mongo.collection.sellers'));
         $this->expectedMinotaurData = [
-            'seller_ids' => ['A3RFFOCMGATC6W'],
+            'seller_ids' => [
+                'uk' => 'A3RFFOCMGATC6W'
+            ],
             'name' => 'Minotaur',
             'email' => 'callum@mediadevil.com',
             'products' => [],
         ];
+        $this->marketplace = new Marketplace('uk', $this->environment);
     }
 
     protected function tearDown()
     {
-        $this->merchantCollection->remove([]);
+        $this->sellersCollection->remove([]);
     }
 
-    public function test_repository_should_create_a_seller()
+    public function test_repository_should_return_a_seller()
     {
         $this->loadMinotaurFixtures();
 
         $sellerId = 'A3RFFOCMGATC6W';
-        $seller = $this->repository->findSeller($sellerId);
+        $seller = $this->repository->findSeller($sellerId, $this->marketplace);
 
         $this->assertInstanceOf('Simian\Seller', $seller);
         $this->assertEquals($this->expectedMinotaurData, $seller->toArray());
@@ -52,7 +56,7 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
     public function test_repository_should_return_null_if_seller_does_not_exist()
     {
         $sellerId = 'A3RFFOCMGATC6W';
-        $seller = $this->repository->findSeller($sellerId);
+        $seller = $this->repository->findSeller($sellerId, $this->marketplace);
 
         $this->assertNull($seller);
     }
@@ -62,7 +66,7 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
         $seller = new Seller(['a-seller-id'], 'a-seller-name', 'a-seller-email', []);
 
         $this->repository->insertOne($seller);
-        $actualSeller = $this->merchantCollection->findOne(['seller_ids' => 'a-seller-id']);
+        $actualSeller = $this->sellersCollection->findOne(['seller_ids' => 'a-seller-id']);
 
         $this->assertTrue(is_array($actualSeller));
     }
@@ -73,14 +77,14 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->repository->insertOne($seller);
         $this->repository->insertOne($seller);
-        $actualSeller = $this->merchantCollection->find(['seller_ids' => 'a-seller-id']);
+        $actualSeller = $this->sellersCollection->find(['seller_ids' => 'a-seller-id']);
 
         $this->assertEquals(1, $actualSeller->count());
     }
 
     private function loadMinotaurFixtures()
     {
-        $this->merchantCollection->insert($this->expectedMinotaurData);
+        $this->sellersCollection->insert($this->expectedMinotaurData);
         unset($this->expectedMinotaurData['_id']); // _id is set by the driver
     }
 }

@@ -9,6 +9,7 @@
 namespace Simian\Repositories;
 
 use Simian\Seller;
+use Simian\Marketplace;
 use Simian\Environment\Environment;
 
 /**
@@ -25,13 +26,13 @@ class MongoSellerRepository
         $client = new \MongoClient($environment->get('mongo.host'));
         $db = $client->selectDB($environment->get('mongo.data.db'));
 
-        $this->collection = $db->selectCollection($environment->get('mongo.collection.merchants'));
+        $this->collection = $db->selectCollection($environment->get('mongo.collection.sellers'));
     }
 
-    public function findSeller($sellerId)
+    public function findSeller($sellerId, Marketplace $marketplace)
     {
         $data = $this->collection->findOne([
-            'seller_ids' => $sellerId,
+            "seller_ids.{$marketplace->getSlug()}" => $sellerId,
         ]);
 
         if (!isset($data)) {

@@ -22,7 +22,7 @@ class CatalogueScraperTest extends \PHPUnit_Framework_TestCase
         );
         $client = new \MongoClient();
         $db = $client->selectDb($this->environment->get('mongo.data.db'));
-        $this->collection = $db->selectCollection($this->environment->get('mongo.collection.merchants'));
+        $this->collection = $db->selectCollection($this->environment->get('mongo.collection.sellers'));
         $this->collection->insert([
             'seller_ids' => $this->seller->getIds(),
             'name' => 'Mediadevil',

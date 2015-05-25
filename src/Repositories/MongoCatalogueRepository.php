@@ -19,7 +19,7 @@ class MongoCatalogueRepository
         $client = new \MongoClient($environment->get('mongo.host'));
         $mainDb = $client->selectDB($environment->get('mongo.data.db'));
         $this->collection = $mainDb->selectCollection(
-            $environment->get("mongo.collection.merchants")
+            $environment->get("mongo.collection.sellers")
         );
     }
 

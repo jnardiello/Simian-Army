@@ -22,8 +22,8 @@ class ReviewsScraperTest extends AbstractScraperTest
                                     $this->environment,
                                     $this->queueRepository
                                 );
-        $this->merchantsCollection = $client->selectDB($this->environment->get('mongo.data.db'))
-                                            ->selectCollection($this->environment->get('mongo.collection.merchants'));
+        $this->sellersCollection = $client->selectDB($this->environment->get('mongo.data.db'))
+                                            ->selectCollection($this->environment->get('mongo.collection.sellers'));
         $this->queueCollection = $client->selectDB($this->environment->get('mongo.data.db'))
                                         ->selectCollection($this->environment->get('mongo.collection.queue'));
         $this->seller = new Seller(['A3RFFOCMGATC6W'], 'Minotaur Accessories', 'someemail@minotaur.com', [], 'A3RFFOCMGATC6W');
@@ -32,7 +32,7 @@ class ReviewsScraperTest extends AbstractScraperTest
     public function tearDown()
     {
         $this->collection->remove([]);
-        $this->merchantsCollection->remove([]);
+        $this->sellersCollection->remove([]);
         $this->queueCollection->remove([]);
     }
 
@@ -137,7 +137,7 @@ class ReviewsScraperTest extends AbstractScraperTest
 
     private function loadMinotaurFixtures()
     {
-        $this->merchantsCollection->insert([
+        $this->sellersCollection->insert([
             '_id' => 'A3RFFOCMGATC6W',
             'name' => 'Minotaur Accessories',
             'email' => 'callum@mediadevil.com',

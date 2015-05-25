@@ -102,28 +102,37 @@ class CatalogueScraperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedProducts, $catalogue['products']);
     }
 
-    public function xtest_scraper_should_be_idempotent_when_adding_products()
+    public function test_scraper_should_be_idempotent_when_adding_products()
     {
         $scraper = $this->getStubbedScraper();
-        $scraper->run($this->merchantId);
-        $scraper->run($this->merchantId);
+        $scraper->run(
+            $this->seller->getIds()[$this->marketplace->getSlug()]
+        );
+        $scraper->run(
+            $this->seller->getIds()[$this->marketplace->getSlug()]
+        );
 
         $expectedProducts = [
             [
                 'asin' => 'asin-1',
                 'active' => true,
+                'marketplace' => 'uk',
             ],
             [
                 'asin' => 'asin-2',
                 'active' => true,
+                'marketplace' => 'uk',
             ],
             [
                 'asin' => 'asin-3',
                 'active' => true,
+                'marketplace' => 'uk',
             ],
         ];
         $catalogue = $this->collection->findOne([
-            'seller_ids' => $this->merchantId,
+            "seller_ids.{$this->marketplace->getSlug()}" => 
+            $this->seller->getIds()[$this->marketplace->getSlug()]
+,
         ]);
 
         $this->assertEquals($expectedProducts, $catalogue['products']);

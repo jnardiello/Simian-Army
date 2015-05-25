@@ -44,7 +44,6 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $sellerId = 'A3RFFOCMGATC6W';
         $seller = $this->repository->findSeller($sellerId);
-        unset($this->expectedMinotaurData['_id']);
 
         $this->assertInstanceOf('Simian\Seller', $seller);
         $this->assertEquals($this->expectedMinotaurData, $seller->toArray());
@@ -82,5 +81,6 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
     private function loadMinotaurFixtures()
     {
         $this->merchantCollection->insert($this->expectedMinotaurData);
+        unset($this->expectedMinotaurData['_id']); // _id is set by the driver
     }
 }

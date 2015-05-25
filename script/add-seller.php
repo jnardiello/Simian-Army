@@ -9,9 +9,9 @@ use GuzzleHttp\Client;
 use Simian\Repositories\MongoSellerRepository;
 
 $seller = [
-    'name' => '',
+    'name' => 'MediaDevil',
     'id' => [],
-    'email' => '',
+    'email' => 'callum@mediadevil.com',
 ];
 
 // NAME

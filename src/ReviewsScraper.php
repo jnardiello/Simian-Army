@@ -25,7 +25,8 @@ class ReviewsScraper
         'swSprite s_star_3_0 ' => 3,
         'swSprite s_star_2_0 ' => 2,
         'swSprite s_star_1_0 ' => 1,
-            ];
+    ];
+    private $template;
 
     public function __construct(Environment $environment, Client $client, MongoReviewsRepository $repository, Marketplace $marketplace)
     {
@@ -33,6 +34,7 @@ class ReviewsScraper
         $this->client = $client;
         $this->repository = $repository;
         $this->marketplace = $marketplace;
+        $this->template = require __DIR__ . '/../templates/' . $this->marketplace->getSlug() . ".php";
     }
 
     public function run(Seller $seller, array $asins = [])
@@ -47,10 +49,11 @@ class ReviewsScraper
 
     private function persistReviewsPage($asin, $url, $currentDepth = null, $maxDepth = null)
     {
-        var_dump("Scraping {$asin}");
+        /* var_dump("Scraping {$asin}"); */
         $stream = $this->getHtmlStream($url);
         $crawler = new Crawler((string) $stream);
-        $this->mainProductLink = $this->exists('(//h1/div/a/@href)[1]', $crawler);
+        /* $this->mainProductLink = $this->exists('(//h1/div/a/@href)[1]', $crawler); */
+        $this->mainProductLink = $this->exists($this->template['main_product_link'], $crawler);
 
         // Checking number of review pages that we actually need to crawl
         if (!isset($currentDepth, $maxDepth)) {
@@ -65,17 +68,17 @@ class ReviewsScraper
 
         $crawler->filterXPath('//table[@id="productReviews"]//td/div')
                 ->each(function($doc) use ($asin){
-                    $review['_id'] = $this->extractIdFromPermalink($this->exists('(//div/span/a/@href)[1]', $doc));
-                    $review['rating'] = $this->prettyRating($this->exists('(//div//span/@class)[1]', $doc));
-                    $review['product_title'] = $this->prettyProductTitle($this->exists('(//div/b)[1]', $doc));
-                    $review['product_link'] = $this->assignLink($this->exists('(//div/b/a/@href)[1]', $doc));
-                    $review['review_title'] = $this->exists('(//b)[1]', $doc);
-                    $review['review_author'] = $this->exists('(//div/a[1])[1]', $doc);
-                    $review['date'] = new \MongoDate(strtotime($this->exists('(//nobr)[1]', $doc)));
-                    $review['verified_purchase'] = $this->exists('//span[@class="crVerifiedStripe"]', $doc);
+                    $review['_id'] = $this->extractIdFromPermalink($this->exists($this->template['_id'], $doc));
+                    $review['rating'] = $this->prettyRating($this->exists($this->template['rating'], $doc));
+                    $review['product_title'] = $this->prettyProductTitle($this->exists($this->template['product_title'], $doc));
+                    $review['product_link'] = $this->assignLink($this->exists($this->template['product_link'], $doc));
+                    $review['review_title'] = $this->exists($this->template['review_title'], $doc);
+                    $review['review_author'] = $this->exists($this->template['review_author'], $doc);
+                    $review['date'] = new \MongoDate(strtotime($this->exists($this->template['date'], $doc)));
+                    $review['verified_purchase'] = $this->exists($this->template['verified_purchase'], $doc);
                     $review['asin'] = $asin;
-                    $review['permalink'] = $this->exists('(//div/span/a/@href)[1]', $doc);
-                    $review['text'] = $this->exists('//div[@class="reviewText"]', $doc);
+                    $review['permalink'] = $this->exists($this->template['permalink'], $doc);
+                    $review['text'] = $this->exists($this->template['text'], $doc);
                     $review['seller_id'] = $this->seller->getOriginalId();
                     $review['seller_name'] = $this->seller->getName();
                     $review['marketplace'] = $this->marketplace->getSlug();
@@ -85,7 +88,7 @@ class ReviewsScraper
                     $this->repository->addReviewToAsin($review, $asin);
             });
 
-        $nextLink = $crawler->filterXPath("(//span[@class='paging']/a[contains(text(), 'Successivo ›')]/@href)[1]");
+        $nextLink = $crawler->filterXPath($this->template['next']);
         if ($nextLink->count()) {
             $this->persistReviewsPage($asin, $nextLink->text(), ++$currentDepth, $maxDepth);
         }

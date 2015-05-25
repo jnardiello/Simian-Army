@@ -31,6 +31,7 @@ class ReviewBuilderTest extends \PHPUnit_Framework_TestCase {
             'verified_purchase' => 'is-verified',
             'permalink' => 'some-permalink',
             'text' => 'a-review-text',
+            'marketplace' => 'it',
         ];
         $review = ReviewBuilder::aReview()
                                 ->havingSeller('a-seller-id', 'a-seller-name')
@@ -44,6 +45,7 @@ class ReviewBuilderTest extends \PHPUnit_Framework_TestCase {
                                 ->with('text', 'a-review-text')
                                 ->with('review_title', 'a-review-title')
                                 ->with('review_author', 'a-review-author')
+                                ->with('marketplace', 'it')
                                 ->build();
 
         $this->assertInstanceOf('Simian\Reviews\Review', $review);
@@ -66,6 +68,7 @@ class ReviewBuilderTest extends \PHPUnit_Framework_TestCase {
             'verified_purchase' => 'is-verified',
             'permalink' => 'some-permalink',
             'text' => 'a-review-text',
+            'marketplace' => 'it',
         ];
 
         $review = ReviewBuilder::aReviewFromArray($expectedReview);

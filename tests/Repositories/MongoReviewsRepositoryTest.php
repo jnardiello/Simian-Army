@@ -45,6 +45,7 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
             'asin' => $asin,
             'permalink' => 'http://some-permalink.com',
             'text' => 'great product!',
+            'marketplace' => 'it',
         ]);
 
         $repository = new MongoReviewsRepository($this->environment, $this->queueRepository);
@@ -73,6 +74,7 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
             'asin' => $asin,
             'permalink' => 'http://some-permalink.com',
             'text' => 'great product!',
+            'marketplace' => 'it',
         ]);
 
         $repository = new MongoReviewsRepository($this->environment, $this->queueRepository);
@@ -103,6 +105,7 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
             'asin' => $asin,
             'permalink' => 'http://some-permalink.com',
             'text' => 'great product!',
+            'marketplace' => 'it',
         ]);
 
         $review2 = ReviewBuilder::aReviewFromArray([
@@ -121,6 +124,7 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
             'asin' => $asin,
             'permalink' => 'http://some-permalink.com',
             'text' => 'great product!',
+            'marketplace' => 'it',
         ]);
 
         $repository = new MongoReviewsRepository($this->environment, $this->queueRepository);

@@ -29,7 +29,25 @@ class MongoSellerRepository
         $this->collection = $db->selectCollection($environment->get('mongo.collection.sellers'));
     }
 
-    public function findSeller($sellerId, Marketplace $marketplace)
+    public function findByName($sellerName)
+    {
+        $data = $this->collection->findOne([
+            'name' => $sellerName,
+        ]);
+
+        if (!isset($data)) {
+            return null;
+        }
+
+        return new Seller(
+            $data['seller_ids'],
+            $data['name'],
+            $data['email'],
+            $data['products']
+        );
+    }
+
+    public function findById($sellerId, Marketplace $marketplace)
     {
         $data = $this->collection->findOne([
             "seller_ids.{$marketplace->getSlug()}" => $sellerId,

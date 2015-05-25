@@ -42,12 +42,23 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->sellersCollection->remove([]);
     }
 
-    public function test_repository_should_return_a_seller()
+    public function test_repository_should_return_a_seller_when_searching_by_id()
     {
         $this->loadMinotaurFixtures();
 
         $sellerId = 'A3RFFOCMGATC6W';
-        $seller = $this->repository->findSeller($sellerId, $this->marketplace);
+        $seller = $this->repository->findById($sellerId, $this->marketplace);
+
+        $this->assertInstanceOf('Simian\Seller', $seller);
+        $this->assertEquals($this->expectedMinotaurData, $seller->toArray());
+    }
+
+    public function test_repository_should_return_a_seller_when_searching_by_name()
+    {
+        $this->loadMinotaurFixtures();
+
+        $sellerName = 'Minotaur';
+        $seller = $this->repository->findByName($sellerName);
 
         $this->assertInstanceOf('Simian\Seller', $seller);
         $this->assertEquals($this->expectedMinotaurData, $seller->toArray());
@@ -56,28 +67,35 @@ class MongoSellerRepositoryTest extends \PHPUnit_Framework_TestCase
     public function test_repository_should_return_null_if_seller_does_not_exist()
     {
         $sellerId = 'A3RFFOCMGATC6W';
-        $seller = $this->repository->findSeller($sellerId, $this->marketplace);
+        $seller = $this->repository->findById($sellerId, $this->marketplace);
 
         $this->assertNull($seller);
     }
 
     public function test_repository_should_insert_new_seller()
     {
-        $seller = new Seller(['a-seller-id'], 'a-seller-name', 'a-seller-email', []);
+        $seller = new Seller(
+            [
+                'uk' => 'a-seller-id',
+            ],
+            'a-seller-name',
+            'a-seller-email',
+            []
+        );
 
         $this->repository->insertOne($seller);
-        $actualSeller = $this->sellersCollection->findOne(['seller_ids' => 'a-seller-id']);
+        $actualSeller = $this->sellersCollection->findOne(['seller_ids.uk' => 'a-seller-id']);
 
         $this->assertTrue(is_array($actualSeller));
     }
 
     public function test_repository_insert_should_be_idempotent()
     {
-        $seller = new Seller(['a-seller-id'], 'a-seller-name', 'a-seller-email', []);
+        $seller = new Seller(['uk' => 'a-seller-id'], 'a-seller-name', 'a-seller-email', []);
 
         $this->repository->insertOne($seller);
         $this->repository->insertOne($seller);
-        $actualSeller = $this->sellersCollection->find(['seller_ids' => 'a-seller-id']);
+        $actualSeller = $this->sellersCollection->find(['seller_ids.uk' => 'a-seller-id']);
 
         $this->assertEquals(1, $actualSeller->count());
     }

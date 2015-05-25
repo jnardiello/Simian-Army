@@ -12,32 +12,39 @@ use Simian\Repositories\MongoReviewsRepository;
 use Mailgun\Mailgun;
 use Simian\Repositories\MongoSellerRepository;
 
-/* $options = getopt("", [ */
-/*     'seller:', */
-/* ]); */
-/* $sellerId = $options['seller']; */
-
-$marketplaceId = "uk";
-$seller = [
-    'mediadevil' => "A1010PM0QYBVOG",
-];
-$sellerId = $seller['mediadevil'];
-
-    /* "A3RFFOCMGATC6W", */
-    /* "A2CODDGMAUR50 */
-
-// SETUP
 $environment = new Environment('prod');
-$catalogueRepository = new MongoCatalogueRepository($environment, $sellerId);
+$client = new Client();
+$sellerRepository = new MongoSellerRepository($environment);
+
+/**
+ * Getting Name & Marketplace from I
+ */
+$options = getopt("", [
+    'name:',
+    'marketplace:'
+]);
+
+if (!isset($options['name']) || !isset($options['marketplace'])) {
+    echo "\n\nPlease, add --name and a --marketplace option\n\n";
+}
+$sellerName = $options['name'];
+$marketplace = new Marketplace($options['marketplace'], $environment);
+
+$seller = $sellerRepository->findByName($sellerName);
+$sellerIds = $seller->getIds();
+
+// Generating Repositories for products and reviews
+$catalogueRepository = new MongoCatalogueRepository(
+    $environment, 
+    $sellerIds[$marketplace->getSlug()], 
+    $marketplace
+);
 $reviewsRepository = new MongoReviewsRepository(
     $environment,
     (new MongoMailQueueRepository($environment))
 );
-$sellerRepository = new MongoSellerRepository($environment);
 
 // CONTROLLER
-$seller = $sellerRepository->findSeller($sellerId);
-$client = new Client();
 $reviewsScraper = new ReviewsScraper(
     $environment,
     $client,

@@ -9,7 +9,7 @@ build:
           code: composer install --no-interaction --prefer-source
       - script:
           name: run unit tests
-          code: phpunit
+          code: vendor/bin/phpunit
       # Add more steps here:
       #- script:
       #    name: run unit tests

@@ -68,7 +68,9 @@ class MongoCatalogueRepository
         $results = [];
 
         foreach ($catalogue['products'] as $product) {
-            $results[] = $product['asin'];
+            if ($product['marketplace'] == $this->marketplace->getSlug()) {
+                $results[] = $product['asin'];
+            }
         }
 
         return $results;

@@ -30,13 +30,17 @@ if (!isset($options['name']) || !isset($options['marketplace'])) {
 $sellerName = $options['name'];
 $marketplace = new Marketplace($options['marketplace'], $environment);
 
-$seller = $sellerRepository->findByName($sellerName)
-    ->setOriginalId($seller->getIds()[$marketplace->getSlug()]);
+$seller = $sellerRepository->findByName($sellerName);
+$seller->setOriginalId($seller->getIds()[$marketplace->getSlug()]);
 
+var_dump(
+    $seller->getIds()[$marketplace->getSlug()]
+);
+die();
 // Generating Repositories for products and reviews
 $catalogueRepository = new MongoCatalogueRepository(
     $environment, 
-    $sellerIds[$marketplace->getSlug()], 
+    $seller->getIds()[$marketplace->getSlug()], 
     $marketplace
 );
 $reviewsRepository = new MongoReviewsRepository(

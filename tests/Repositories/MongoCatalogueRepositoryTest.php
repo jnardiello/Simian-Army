@@ -16,6 +16,7 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->merchantsCollection = $mainDb->selectCollection($this->environment->get('mongo.collection.sellers'));
         $this->marketplaceUK = new Marketplace('uk', $this->environment);
         $this->marketplaceDE = new Marketplace('de', $this->environment);
+        $this->marketplaceIT = new Marketplace('it', $this->environment);
     }
 
     public function tearDown()
@@ -114,7 +115,8 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
         $merchantFixture = [
             '_id' => $mongoId,
             'seller_ids' => [
-                'uk' => 'a-merchant-id'
+                'it' => 'a-merchant-id',
+                'de' => 'a-merchant-id',
             ],
             'name' => 'a-merchant-name',
             'products' => [],
@@ -123,11 +125,13 @@ class MongoCatalogueRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->merchantsCollection->insert($merchantFixture);
 
-        $repository = new MongoCatalogueRepository($this->environment, 'a-merchant-id', $this->marketplaceUK);
-        $repository->add('a-product-asin');
-        $repository->add('another-product-asin');
+        $repositoryDE = new MongoCatalogueRepository($this->environment, 'a-merchant-id', $this->marketplaceDE);
+        $repositoryIT = new MongoCatalogueRepository($this->environment, 'a-merchant-id', $this->marketplaceIT);
+        $repositoryDE->add('a-product-asin');
+        $repositoryDE->add('another-product-asin');
+        $repositoryIT->add('a-third-product');
 
-        $products = $repository->getProductsCatalogue();
+        $products = $repositoryDE->getProductsCatalogue();
         $this->assertEquals($expectedProducts, $products);
     }
 

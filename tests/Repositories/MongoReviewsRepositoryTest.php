@@ -86,7 +86,7 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $this->reviewsCollection->count());
     }
 
-    public function test_can_count_all_reviews_for_a_given_product()
+    public function test_can_count_all_reviews_for_a_given_product_in_a_specific_marketplace()
     {
         $asin = 'an-asin';
         $review1 = ReviewBuilder::aReviewFromArray([
@@ -127,10 +127,30 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
             'marketplace' => 'it',
         ]);
 
+        $reviewUk = ReviewBuilder::aReviewFromArray([
+            '_id' => 'this-is-a-third-id',
+            'seller_id' => 'some_seller_id',
+            'seller_name' => 'some_seller_name',
+            'product_title' => 'some-product-title',
+            'product_link' => 'product-link',
+            'verified_purchase' => 'yes',
+            'rating' => 'a-review-rating',
+            'review_title' => 'a-review-title',
+            'review_author' => 'an-author-name',
+            'date' => 'some-date',
+            'verified-purchase' => 'yes',
+            'item_link' => 'http://some-line.com',
+            'asin' => $asin,
+            'permalink' => 'http://some-permalink.com',
+            'text' => 'great product!',
+            'marketplace' => 'uk',
+        ]);
+
         $repository = new MongoReviewsRepository($this->environment, $this->queueRepository);
         $repository->addReviewToAsin($review1, $asin);
         $repository->addReviewToAsin($review2, $asin);
+        $repository->addReviewToAsin($reviewUk, $asin);
 
-        $this->assertEquals(2, $repository->countReviewsFor($asin));
+        $this->assertEquals(2, $repository->countReviewsFor($asin, 'it'));
     }
 }

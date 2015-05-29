@@ -28,10 +28,11 @@ class MongoReviewsRepository
         }
     }
 
-    public function countReviewsFor($asin)
+    public function countReviewsFor($asin, $marketplace)
     {
         return $this->reviewsCollection->count([
             'asin' => $asin,
+            'marketplace' => $marketplace,
         ]);
     }
 }

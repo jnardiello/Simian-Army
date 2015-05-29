@@ -3,6 +3,7 @@
 namespace Simian\Repositories;
 
 use Simian\Reviews\Review;
+use Simian\Marketplace;
 
 /**
  * Class MongoReviewsRepository
@@ -28,11 +29,11 @@ class MongoReviewsRepository
         }
     }
 
-    public function countReviewsFor($asin, $marketplace)
+    public function countReviewsFor($asin, Marketplace $marketplace)
     {
         return $this->reviewsCollection->count([
             'asin' => $asin,
-            'marketplace' => $marketplace,
+            'marketplace' => $marketplace->getSlug(),
         ]);
     }
 }

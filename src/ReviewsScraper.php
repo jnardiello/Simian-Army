@@ -52,7 +52,6 @@ class ReviewsScraper
         /* var_dump("Scraping {$asin}"); */
         $stream = $this->getHtmlStream($url);
         $crawler = new Crawler((string) $stream);
-        /* $this->mainProductLink = $this->exists('(//h1/div/a/@href)[1]', $crawler); */
         $this->mainProductLink = $this->exists($this->template['main_product_link'], $crawler);
 
         // Checking number of review pages that we actually need to crawl
@@ -158,12 +157,17 @@ class ReviewsScraper
             $regex = '/^([0-9,]+).*$/i';
             preg_match($regex, $numCurrentReviews, $matches);
 
-            // Need to sanitize reviews with thousands of reviews
+
             // format '3,704' -> 3704 int
             $currentTotReviews = (int) str_replace(',', '', $matches[1]);
-            $alreadyStoreRepositories = $this->repository->countReviewsFor($asin);
+            $alreadyStoredReviews = $this->repository->countReviewsFor($asin, $this->marketplace);
 
-            return ceil(($currentTotReviews - $alreadyStoreRepositories)/10);
+            $pagesToCrawl = ceil(($currentTotReviews - $alreadyStoredReviews)/10);
+
+            if ($pagesToCrawl > 0)
+                return $pagesToCrawl;
+
+            throw new \Exception('Database is not consistent with page total reviews');
         }
     }
 }

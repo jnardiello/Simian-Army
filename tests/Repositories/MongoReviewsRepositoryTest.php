@@ -4,6 +4,7 @@ namespace Simian\Repositories;
 
 use Simian\Environment\Environment;
 use Simian\Reviews\ReviewBuilder;
+use Simian\Marketplace;
 
 /**
  * @author Jacopo Nardiello
@@ -18,6 +19,7 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->reviewsCollection = $mainDb->selectCollection($this->environment->get('mongo.collection.reviews'));
         $this->queueCollection = $mainDb->selectCollection($this->environment->get('mongo.collection.queue'));
         $this->queueRepository = new MongoMailQueueRepository($this->environment);
+        $this->marketplace = new Marketplace('it', $this->environment);
     }
 
     public function tearDown()
@@ -151,6 +153,6 @@ class MongoReviewsRepositoryTest extends \PHPUnit_Framework_TestCase
         $repository->addReviewToAsin($review2, $asin);
         $repository->addReviewToAsin($reviewUk, $asin);
 
-        $this->assertEquals(2, $repository->countReviewsFor($asin, 'it'));
+        $this->assertEquals(2, $repository->countReviewsFor($asin, $this->marketplace));
     }
 }

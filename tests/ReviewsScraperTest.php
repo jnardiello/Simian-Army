@@ -83,6 +83,35 @@ class ReviewsScraperTest extends AbstractScraperTest
         ]);
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Database is not consistent with page total reviews
+     */
+    public function test_scraper_should_throw_exception_if_database_has_more_reviews_than_total_reviews_on_product_page()
+    {
+        $stubbedHtml = file_get_contents(__DIR__ . "/fixtures/html/reviews2.html");
+        $client = $this->getStubbedHttpClient($stubbedHtml);
+
+        $reviewsScraper = new ReviewsScraper(
+            $this->environment,
+            $client,
+            $this->repository,
+            $this->marketplace
+        );
+
+        $reviewsJsonString = file_get_contents(__DIR__ . "/fixtures/json/reviews-exception.json");
+        $reviewsFixtures = json_decode($reviewsJsonString, true);
+
+        // loading fixtures
+        foreach ($reviewsFixtures as $fixture) {
+            $this->collection->insert($fixture);
+        }
+
+        $reviewsScraper->run($this->seller, [
+            'a-test-asin',
+        ]);
+    }
+
     public function test_scraper_should_select_product_link_from_review()
     {
         $stubbedHtml = file_get_contents(__DIR__ . "/fixtures/html/review-link.html");

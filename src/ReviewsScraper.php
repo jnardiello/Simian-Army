@@ -49,7 +49,7 @@ class ReviewsScraper
 
     private function persistReviewsPage($asin, $url, $currentDepth = null, $maxDepth = null)
     {
-        /* var_dump("Scraping {$asin}"); */
+        var_dump("Scraping {$asin}");
         $stream = $this->getHtmlStream($url);
         $crawler = new Crawler((string) $stream);
         $this->mainProductLink = $this->exists($this->template['main_product_link'], $crawler);
@@ -164,7 +164,7 @@ class ReviewsScraper
 
             $pagesToCrawl = ceil(($currentTotReviews - $alreadyStoredReviews)/10);
 
-            if ($pagesToCrawl > 0)
+            if ($pagesToCrawl >= 0)
                 return $pagesToCrawl;
 
             throw new \Exception('Database is not consistent with page total reviews');

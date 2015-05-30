@@ -12,7 +12,8 @@
         "mailgun/mailgun-php": "~1.7.2"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.*"
+        "phpunit/phpunit": "4.*",
+        "phing/phing": "2.*"
     },
     "license": "MIT",
     "authors": [

@@ -2,3 +2,8 @@ vendor
 storage
 .idea
 *.note
+tags
+*.DS_Store
+*.swp
+*.swo
+*.swn

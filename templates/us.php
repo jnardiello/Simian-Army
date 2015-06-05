@@ -1,7 +1,8 @@
 <?php
 
 return $template = [
-    "_id" => "(//div[@id='cm_cr-review_list']/div/@id)[1]",
+    "context" => "(//div[contains(concat(' ', @class, ' '), ' review ')])[1]",
+    "_id" => "(//div[contains(concat(' ', @class, ' '), ' review ')]/@id)[1]",
     "rating" => "(//i/span)[1]",
     "product_title" => "(//a[contains(concat(' ', @class, ' '), ' a-size-mini ')])[1]",
     "product_link" => "(//a[contains(concat(' ', @class, ' '), ' a-size-mini ')]/@href)[1]",

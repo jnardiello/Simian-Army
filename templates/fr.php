@@ -1,6 +1,7 @@
 <?php
 
 return $template = [
+    "context" => "//table[@id='productReviews']//td/div",
     "_id" => "(//div/span/a/@href)[1]",
     "rating" => "(//div//span/@class)[1]",
     "product_title" => "(//div/b)[1]",

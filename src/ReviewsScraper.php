@@ -49,7 +49,7 @@ class ReviewsScraper
 
     private function persistReviewsPage($asin, $url, $currentDepth = null, $maxDepth = null)
     {
-        var_dump("Scraping {$asin}");
+        /* var_dump("Scraping {$asin}"); */
         $stream = $this->getHtmlStream($url);
         $crawler = new Crawler((string) $stream);
         $this->mainProductLink = $this->exists($this->template['main_product_link'], $crawler);
@@ -65,18 +65,27 @@ class ReviewsScraper
             return ;
         }
 
-        $crawler->filterXPath('//table[@id="productReviews"]//td/div')
+        /* $crawler->filterXPath('') */
+        $crawler->filterXPath($this->template['context'])
                 ->each(function($doc) use ($asin){
-                    $review['_id'] = $this->extractIdFromPermalink($this->exists($this->template['_id'], $doc));
-                    $review['rating'] = $this->prettyRating($this->exists($this->template['rating'], $doc));
-                    $review['product_title'] = $this->prettyProductTitle($this->exists($this->template['product_title'], $doc));
-                    $review['product_link'] = $this->assignLink($this->exists($this->template['product_link'], $doc));
+                    if ($this->marketplace->getSlug() != 'us') {
+                        $review['_id'] = $this->extractIdFromPermalink($this->exists($this->template['_id'], $doc));
+                        $review['rating'] = $this->prettyRating($this->exists($this->template['rating'], $doc));
+                        $review['product_title'] = $this->prettyProductTitle($this->exists($this->template['product_title'], $doc));
+                        $review['product_link'] = $this->assignLink($this->exists($this->template['product_link'], $doc));
+                        $review['permalink'] = $this->exists($this->template['permalink'], $doc);
+                    } else {
+                        $review['_id'] = $this->exists($this->template['_id'], $doc);
+                        $review['rating'] = $this->exists($this->template['rating'], $doc);
+                        $review['product_title'] = $this->exists($this->template['product_title'], $doc);
+                        $review['product_link'] = $this->normalizeUrl($this->exists($this->template['product_link'], $doc));
+                        $review['permalink'] = $this->normalizeUrl($this->exists($this->template['permalink'], $doc));
+                    }
                     $review['review_title'] = $this->exists($this->template['review_title'], $doc);
                     $review['review_author'] = $this->exists($this->template['review_author'], $doc);
                     $review['date'] = new \MongoDate(strtotime($this->exists($this->template['date'], $doc)));
                     $review['verified_purchase'] = $this->exists($this->template['verified_purchase'], $doc);
                     $review['asin'] = $asin;
-                    $review['permalink'] = $this->exists($this->template['permalink'], $doc);
                     $review['text'] = $this->exists($this->template['text'], $doc);
                     $review['seller_id'] = $this->seller->getOriginalId();
                     $review['seller_name'] = $this->seller->getName();
@@ -87,10 +96,15 @@ class ReviewsScraper
                     $this->repository->addReviewToAsin($review, $asin);
             });
 
-        $nextLink = $crawler->filterXPath($this->template['next']);
-        if ($nextLink->count()) {
-            $this->persistReviewsPage($asin, $nextLink->text(), ++$currentDepth, $maxDepth);
+        $nextLink = $this->normalizeUrl($this->exists($this->template['next'], $crawler));
+        if (isset($nextLink)) {
+            $this->persistReviewsPage($asin, $nextLink, ++$currentDepth, $maxDepth);
         }
+    }
+
+    private function normalizeUrl($url)
+    {
+        return $this->marketplace->getBaseUrl() . $url;
     }
 
     private function prettyProductTitle($text)

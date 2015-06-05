@@ -18,6 +18,7 @@ $seller = new Seller(
         'uk' => 'A1010PM0QYBVOG',
         'it' => 'A1010PM0QYBVOG',
         'de' => 'A1010PM0QYBVOG',
+        'fr' => 'A1010PM0QYBVOG',
     ],
     'MediaDevil',
     'jacopo.nardiello@gmail.com',

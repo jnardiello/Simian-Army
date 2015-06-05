@@ -29,6 +29,7 @@ class ReviewsScraperTest extends AbstractScraperTest
         $this->seller = new Seller(['uk' => 'A3RFFOCMGATC6W'], 'Minotaur Accessories', 'someemail@minotaur.com', []);
         $this->seller->setOriginalId('A3RFFOCMGATC6W');
         $this->marketplace = new Marketplace('uk', $this->environment);
+        $this->marketplaceUS = new Marketplace('us', $this->environment);
     }
 
     public function tearDown()
@@ -169,6 +170,28 @@ class ReviewsScraperTest extends AbstractScraperTest
 
         $this->assertEquals('A3RFFOCMGATC6W', $persistedReview['seller_id']);
         $this->assertEquals('Minotaur Accessories', $persistedReview['seller_name']);
+    }
+
+    public function test_scraper_should_extract_us_template()
+    {
+        $expectedData = [
+        ];
+        $this->loadMinotaurFixtures();
+        $stubbedHtml = file_get_contents(__DIR__ . "/fixtures/html/reviews-links-missing-path-us.html");
+        $reviewsScraper = new ReviewsScraper(
+            $this->environment,
+            $this->getStubbedHttpClient($stubbedHtml),
+            $this->repository,
+            $this->marketplaceUS
+        );
+
+        $reviewsScraper->run($this->seller, [
+            'a-test-asin',
+        ]);
+
+        $persistedReview = $this->collection->findOne();
+
+        $this->assertEquals('R33H5LJZF83QYZ', $persistedReview['_id']);
     }
 
     private function loadMinotaurFixtures()

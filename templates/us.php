@@ -1,7 +1,7 @@
 <?php
 
 return $template = [
-    "context" => "(//div[contains(concat(' ', @class, ' '), ' review ')])[1]",
+    "context" => "//div[contains(concat(' ', @class, ' '), ' review ')]",
     "_id" => "(//div[contains(concat(' ', @class, ' '), ' review ')]/@id)[1]",
     "rating" => "(//i/span)[1]",
     "product_title" => "(//div[contains(concat(' ', @class, ' '), ' product-title ')]//a)[1]",
@@ -14,4 +14,5 @@ return $template = [
     "text" => "//span[contains(concat(' ', @class, ' '), ' review-text ')]",
     "main_product_link" => "(//div[contains(concat(' ', @class, ' '), ' product-title ')]//a/@href)[1]",
     "next" => "(//ul[@class='a-pagination']//li[@class='a-last']/a/@href)[1]",
+    "num_reviews" => "(//span[contains(concat(' ', @class, ' '), ' totalReviewCount ')])[1]",
 ];

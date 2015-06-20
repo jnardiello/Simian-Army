@@ -49,7 +49,6 @@ class ReviewsScraper
 
     private function persistReviewsPage($asin, $url, $currentDepth = null, $maxDepth = null)
     {
-        /* var_dump("Scraping {$asin}"); */
         $stream = $this->getHtmlStream($url);
         $crawler = new Crawler((string) $stream);
         $this->mainProductLink = $this->exists($this->template['main_product_link'], $crawler);
@@ -65,7 +64,6 @@ class ReviewsScraper
             return ;
         }
 
-        /* $crawler->filterXPath('') */
         $crawler->filterXPath($this->template['context'])
                 ->each(function($doc) use ($asin, $crawler){
                     if ($this->marketplace->getSlug() != 'us') {
@@ -79,8 +77,8 @@ class ReviewsScraper
                         $review['_id'] = $this->exists($this->template['_id'], $doc);
                         $review['rating'] = $this->exists($this->template['rating'], $doc);
                         $review['product_title'] = $this->exists($this->template['product_title'], $crawler);
-                        $review['product_link'] = $this->exists($this->template['product_link'], $crawler);
-                        $review['permalink'] = $this->exists($this->template['permalink'], $doc);
+                        $review['product_link'] = $this->normalizeUrl($this->exists($this->template['product_link'], $crawler));
+                        $review['permalink'] = $this->normalizeUrl($this->exists($this->template['permalink'], $doc));
                         $review['date'] = new \MongoDate(strtotime(substr($this->exists($this->template['date'], $doc), 3)));
                     }
                     $review['review_title'] = $this->exists($this->template['review_title'], $doc);
@@ -98,6 +96,7 @@ class ReviewsScraper
             });
 
         $nextLink = $this->normalizeUrl($this->exists($this->template['next'], $crawler));
+
         if (isset($nextLink)) {
             $this->persistReviewsPage($asin, $nextLink, ++$currentDepth, $maxDepth);
         }
@@ -167,7 +166,7 @@ class ReviewsScraper
 
     private function getNumPagesToCrawl($asin, $crawler)
     {
-        $numCurrentReviews = $this->exists("(//table[@id='productSummary']//b)[1]", $crawler);
+        $numCurrentReviews = $this->exists($this->template['num_reviews'], $crawler);
         if (isset($numCurrentReviews)) {
             $regex = '/^([0-9,]+).*$/i';
             preg_match($regex, $numCurrentReviews, $matches);
@@ -179,8 +178,9 @@ class ReviewsScraper
 
             $pagesToCrawl = ceil(($currentTotReviews - $alreadyStoredReviews)/10);
 
-            if ($pagesToCrawl >= 0)
+            if ($pagesToCrawl >= 0) {
                 return $pagesToCrawl;
+            }
 
             throw new \Exception('Database is not consistent with page total reviews');
         }

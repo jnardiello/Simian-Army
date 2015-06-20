@@ -14,4 +14,5 @@ return $template = [
     "text" => "//div[@class='reviewText']",
     "main_product_link" => "(//h1/div/a/@href)[1]",
     "next" => "(//span[@class='paging']/a[contains(text(), 'Successivo ›')]/@href)[1]",
+    "num_reviews" => "(//table[@id='productSummary']//b)[1]",
 ];

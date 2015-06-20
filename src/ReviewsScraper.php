@@ -104,7 +104,11 @@ class ReviewsScraper
 
     private function normalizeUrl($url)
     {
-        return $this->marketplace->getBaseUrl() . $url;
+        if (strpos($url, 'http') === false) {
+            return $this->marketplace->getBaseUrl() . $url;
+        }
+
+        return $url;
     }
 
     private function prettyProductTitle($text)

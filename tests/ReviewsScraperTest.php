@@ -174,8 +174,7 @@ class ReviewsScraperTest extends AbstractScraperTest
 
     public function test_scraper_should_extract_us_template()
     {
-        $expectedData = [
-        ];
+        $expectedData = 'R33H5LJZF83QYZ';
         $this->loadMinotaurFixtures();
         $stubbedHtml = file_get_contents(__DIR__ . "/fixtures/html/reviews-links-missing-path-us.html");
         $reviewsScraper = new ReviewsScraper(
@@ -191,7 +190,7 @@ class ReviewsScraperTest extends AbstractScraperTest
 
         $persistedReview = $this->collection->findOne();
 
-        $this->assertEquals('R33H5LJZF83QYZ', $persistedReview['_id']);
+        $this->assertEquals($expectedData, $persistedReview['_id']);
     }
 
     private function loadMinotaurFixtures()

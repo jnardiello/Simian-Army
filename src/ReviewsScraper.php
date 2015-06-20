@@ -67,23 +67,24 @@ class ReviewsScraper
 
         /* $crawler->filterXPath('') */
         $crawler->filterXPath($this->template['context'])
-                ->each(function($doc) use ($asin){
+                ->each(function($doc) use ($asin, $crawler){
                     if ($this->marketplace->getSlug() != 'us') {
                         $review['_id'] = $this->extractIdFromPermalink($this->exists($this->template['_id'], $doc));
                         $review['rating'] = $this->prettyRating($this->exists($this->template['rating'], $doc));
                         $review['product_title'] = $this->prettyProductTitle($this->exists($this->template['product_title'], $doc));
                         $review['product_link'] = $this->assignLink($this->exists($this->template['product_link'], $doc));
                         $review['permalink'] = $this->exists($this->template['permalink'], $doc);
+                        $review['date'] = new \MongoDate(strtotime($this->exists($this->template['date'], $doc)));
                     } else {
                         $review['_id'] = $this->exists($this->template['_id'], $doc);
                         $review['rating'] = $this->exists($this->template['rating'], $doc);
-                        $review['product_title'] = $this->exists($this->template['product_title'], $doc);
-                        $review['product_link'] = $this->normalizeUrl($this->exists($this->template['product_link'], $doc));
-                        $review['permalink'] = $this->normalizeUrl($this->exists($this->template['permalink'], $doc));
+                        $review['product_title'] = $this->exists($this->template['product_title'], $crawler);
+                        $review['product_link'] = $this->exists($this->template['product_link'], $crawler);
+                        $review['permalink'] = $this->exists($this->template['permalink'], $doc);
+                        $review['date'] = new \MongoDate(strtotime(substr($this->exists($this->template['date'], $doc), 3)));
                     }
                     $review['review_title'] = $this->exists($this->template['review_title'], $doc);
                     $review['review_author'] = $this->exists($this->template['review_author'], $doc);
-                    $review['date'] = new \MongoDate(strtotime($this->exists($this->template['date'], $doc)));
                     $review['verified_purchase'] = $this->exists($this->template['verified_purchase'], $doc);
                     $review['asin'] = $asin;
                     $review['text'] = $this->exists($this->template['text'], $doc);

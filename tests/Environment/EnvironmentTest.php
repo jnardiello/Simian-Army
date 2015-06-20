@@ -16,7 +16,7 @@ class EnvironmentTest extends \PHPUnit_Framework_TestCase
     {
         $mongoDb = $this->environment->get('mongo.queues.db');
 
-        $this->assertEquals('test', $mongoDb);
+        $this->assertEquals('queues', $mongoDb);
     }
 
     public function testWillGetFalseTryingToGetANonExistingProperty()

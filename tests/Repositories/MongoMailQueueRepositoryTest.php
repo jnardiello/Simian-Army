@@ -20,7 +20,7 @@ class MongoMailQueueRepositoryTest extends \PHPUnit_Framework_TestCase {
     {
         $this->environment = new Environment('test');
         $this->queueCollection = (new \MongoClient($this->environment->get('mongo.host')))
-            ->selectDB($this->environment->get('mongo.data.db'))
+            ->selectDB($this->environment->get('mongo.queues.db'))
             ->selectCollection($this->environment->get('mongo.collection.queue'));
     }
 

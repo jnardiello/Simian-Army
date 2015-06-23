@@ -21,7 +21,7 @@ class Mailman
 {
     const DOMAIN = 'simian.army';
     const FROM = 'rainforest@simian.army';
-    const SUBJECT = 'You received a new negative review';
+    const SUBJECT = 'You received a new negative review for ';
     const TYPE = 'send_review_email';
 
     private $queueRepo;
@@ -42,11 +42,12 @@ class Mailman
         $cursor = $this->queueRepo->findAll();
 
         foreach ($cursor as $doc) {
+            $seller = $this->sellerRepo->findByName($doc['payload']['seller_name'])->toArray();
             if ($doc['type'] == static::TYPE && $doc['payload']['rating'] <= 3) {
                 $message = [
                     'from' => static::FROM,
-                    'to' => $this->sellerRepo->findByName($doc['payload']['seller_name']),
-                    'subject' => static::SUBJECT,
+                    'to' => $seller['email'] . ", jacopo@workdigital.co.uk",
+                    'subject' => static::SUBJECT . $doc['payload']['product_title'],
                     'text' => "You have just received a negative review. \nCheck: \n" . $doc['payload']['permalink'],
                 ];
 

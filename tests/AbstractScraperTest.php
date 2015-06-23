@@ -36,13 +36,4 @@ abstract class AbstractScraperTest extends \PHPUnit_Framework_TestCase
 
         return $client;
     }
-
-    protected function getMailgunStub()
-    {
-        $mailgun = $this->getMockBuilder('Mailgun\Mailgun')
-                        ->setMethods(['sendMessage'])
-                        ->getMock();
-
-        return $mailgun;
-    }
 }

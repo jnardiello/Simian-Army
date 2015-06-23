@@ -35,4 +35,22 @@ class MongoMailQueueRepository
 
         $this->queueCollection->insert($data);
     }
+
+    public function remove(array $query = null)
+    {
+        if (empty($query)) {
+            $query = [];
+        }
+        $this->queueCollection->remove($query);
+    }
+
+    public function findAll()
+    {
+        return $this->queueCollection->find([]);
+    }
+
+    public function count()
+    {
+        return $this->queueCollection->count();
+    }
 }

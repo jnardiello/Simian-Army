@@ -75,7 +75,7 @@ class ReviewsScraper
                         $review['date'] = new \MongoDate(strtotime($this->exists($this->template['date'], $doc)));
                     } else {
                         $review['_id'] = $this->exists($this->template['_id'], $doc);
-                        $review['rating'] = $this->exists($this->template['rating'], $doc);
+                        $review['rating'] = (int) $this->exists($this->template['rating'], $doc);
                         $review['product_title'] = $this->exists($this->template['product_title'], $crawler);
                         $review['product_link'] = $this->normalizeUrl($this->exists($this->template['product_link'], $crawler));
                         $review['permalink'] = $this->normalizeUrl($this->exists($this->template['permalink'], $doc));

@@ -46,7 +46,7 @@ class Mailman
             if ($doc['type'] == static::TYPE && $doc['payload']['rating'] <= 3) {
                 $message = [
                     'from' => static::FROM,
-                    'to' => $seller['email'] . ", jacopo@workdigital.co.uk",
+                    'to' => $seller['email'],
                     'subject' => static::SUBJECT . $doc['payload']['product_title'],
                     'text' => "You have just received a negative review. \nCheck: \n" . $doc['payload']['permalink'],
                 ];
